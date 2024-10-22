@@ -1,20 +1,13 @@
-# Utiliser une image officielle de Node.js comme base
-FROM node:18-alpine
+# FROM node:18-alpine
 
-# Créer et définir le répertoire de travail dans le container
-WORKDIR /app
+# WORKDIR /app
 
-# Copier le package.json et package-lock.json pour installer les dépendances
-COPY package*.json ./
+# COPY package*.json ./
 
-# Installer les dépendances
-RUN npm install
+# RUN npm install
 
-# Copier tout le reste du projet dans le container
-COPY . .
+# COPY . .
 
-# Exposer le port 3000
-EXPOSE 3000
+# EXPOSE 3000
 
-# Lancer Next.js en mode développement
-CMD ["npm", "run", "dev"]
+# CMD ["npm", "run", "dev"]
