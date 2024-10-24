@@ -49,7 +49,7 @@ export default function Home() {
         {/* Upload photo for AI detection */}
         <div className="mt-12">
           <h3 className="text-2xl font-bold text-gray-800 mb-4">
-            Utilisez l'IA pour ajouter des ingrédients
+            Utilisez l IA pour ajouter des ingrédients
           </h3>
           <button
             onClick={handleUploadPhoto}
