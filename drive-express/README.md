@@ -35,7 +35,6 @@ Ce projet est une application de type Drive alimentaire inspirée d'Auchan Drive
    cd nom-du-projet
 
 2. Installez les dépendances :
-   ```bash
   npm ou yarn install
 
 3. Créez un fichier .env.local à la racine du projet et ajoutez vos variables d'environnement :
