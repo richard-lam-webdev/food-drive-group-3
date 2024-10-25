@@ -43,7 +43,6 @@ Ce projet est une application de type Drive alimentaire inspirée d'Auchan Drive
   NEXT_PUBLIC_API_KEY=your_api_key
 
 4. Build et lancer le projet en développement :
-   ```bash
   npm run dev ou yarn dev
 
 # Docker
@@ -53,11 +52,9 @@ Ce projet est une application de type Drive alimentaire inspirée d'Auchan Drive
 1. Assurez-vous d'avoir Docker et Docker Compose installés.
 
 2. Pour lancer l'application en développement :
-   ```bash
   docker-compose up
 
 3. Pour arrêter les services :
-  ```bash
   docker-compose down
 
 
