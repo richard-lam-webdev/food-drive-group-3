@@ -40,8 +40,8 @@ Ce projet est une application de type Drive alimentaire inspirée d'Auchan Drive
 
 3. Créez un fichier .env.local à la racine du projet et ajoutez vos variables d'environnement :
    ```bash
-  DATABASE_URL=postgres://user:password@db:3306/dbname
-  NEXT_PUBLIC_API_KEY=your_api_key
+   DATABASE_URL=postgres://user:password@db:3306/dbname
+   NEXT_PUBLIC_API_KEY=your_api_key
 
 4. Build et lancer le projet en développement :
    ```bash
@@ -60,7 +60,3 @@ Ce projet est une application de type Drive alimentaire inspirée d'Auchan Drive
 3. Pour arrêter les services :
    ```bash
    docker-compose down
-
-
-
-
