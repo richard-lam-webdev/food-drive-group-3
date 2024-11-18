@@ -1,79 +1,131 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String     @id @default(uuid())
-  email     String     @unique
+model Utilisateurs {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
   password  String
-  role      Role       @default(CLIENT)
-  orders    Order[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  nom       String?
+  prenom    String?
+  adresse   String?
+  role      Role     @default(client)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  Notifications Notifications[]
+  ImagesTemp ImagesTemp[]
+  RecettesTemp RecettesTemp[]
+  Commandes Commandes[]
+}
+
+model Notifications {
+  id        Int      @id @default(autoincrement())
+  user_id   Int
+  message   String
+  seen      Boolean  @default(false)
+  created_at DateTime @default(now())
+  Utilisateurs Utilisateurs @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model ImagesTemp {
+  id        Int      @id @default(autoincrement())
+  user_id   Int
+  image_url String   @unique
+  uploaded_at DateTime @default(now())
+  Utilisateurs Utilisateurs @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model RecettesTemp {
+  id        Int      @id @default(autoincrement())
+  user_id   Int
+  nom       String
+  description String?
+  ingredients String?
+  instructions String?
+  generated_at DateTime @default(now())
+  Utilisateurs Utilisateurs @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model Categories {
+  id        Int      @id @default(autoincrement())
+  nom       String   @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  Produits  Produits[]
+}
+
+model Produits {
+  id        Int      @id @default(autoincrement())
+  nom       String
+  description String?
+  prix      Float
+  quantite_stock Int
+  categorie_id Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  Categories Categories @relation(fields: [categorie_id], references: [id], onDelete: Cascade)
+  LignesCommandes LignesCommandes[]
+}
+
+model Commandes {
+  id        Int      @id @default(autoincrement())
+  user_id   Int
+  total     Float
+  statut    CommandeStatus @default(en_cours_de_paiement)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  Utilisateurs Utilisateurs @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  LignesCommandes LignesCommandes[]
+
+  HistoriqueCommandes HistoriqueCommandes[]
+}
+
+model LignesCommandes {
+  id        Int      @id @default(autoincrement())
+  order_id  Int
+  product_id Int
+  quantite  Int
+  prix_unitaire Float
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  Produits Produits @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  Commandes Commandes @relation(fields: [order_id], references: [id], onDelete: Cascade)
+}
+
+model HistoriqueCommandes {
+  id        Int      @id @default(autoincrement())
+  order_id  Int
+  statut    CommandeStatus
+  changed_at DateTime @default(now())
+  Commandes Commandes @relation(fields: [order_id], references: [id], onDelete: Cascade)
 }
 
 enum Role {
-  ADMIN
-  CLIENT
-  STOCKIST
+  client
+  admin
+  magasinier
 }
 
-model Product {
-  id          String        @id @default(uuid())
-  name        String
-  description String?
-  price       Float
-  stock       Int           @default(0)
-  image       String?
-  categoryId  String
-  category    Category      @relation(fields: [categoryId], references: [id])
-  orderItems  OrderItem[]
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+enum ImageStatus {
+  en_attente
+  traitee
 }
 
-model Category {
-  id          String    @id @default(uuid())
-  name        String    @unique
-  description String?
-  products    Product[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
-
-model Order {
-  id         String      @id @default(uuid())
-  userId     String
-  user       User        @relation(fields: [userId], references: [id])
-  status     OrderStatus @default(PENDING)
-  items      OrderItem[]
-  total      Float
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-}
-
-model OrderItem {
-  id        String   @id @default(uuid())
-  orderId   String
-  order     Order    @relation(fields: [orderId], references: [id])
-  productId String
-  product   Product  @relation(fields: [productId], references: [id])
-  quantity  Int
-  price     Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-enum OrderStatus {
-  PENDING
-  PAID
-  IN_PREPARATION
-  SHIPPED
-  DELIVERED
-  CANCELLED
+enum CommandeStatus {
+  en_cours_de_paiement
+  payee
+  en_preparation
+  expediee
+  livree
 }
