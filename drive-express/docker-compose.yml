@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   nextjs:
     image: node:18-alpine
@@ -13,14 +12,13 @@ services:
       - NODE_ENV=development
       - DATABASE_URL=mysql://myuser:mypassword@db:3306/mydatabase
     command: >
-      sh -c "
-             if [ ! -d node_modules ]; then
-             echo 'Installing dependencies...' &&
-             npm install &&
-             npm install next@latest;
-             fi &&
-             echo 'Starting development server...' &&
-             npx next dev"
+          sh -c "
+            echo 'Installing dependencies...' &&
+            npm install &&
+            npm install next@latest &&
+            echo 'Starting development server...' &&
+            npx next dev"
+
     depends_on:
       - db
 
