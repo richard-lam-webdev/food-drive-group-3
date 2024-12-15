@@ -31,14 +31,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // Créer le produit en associant l'ID de la catégorie
     const product = await prisma.produits.create({
       data: {
         nom: body.nom,
         description: body.description,
         prix: parseFloat(body.prix),
         quantite_stock: parseInt(body.quantite_stock, 10),
-        categorie_id: category.id, // Utiliser l'ID trouvé
+        categorie_id: category.id,
       },
     });
 
