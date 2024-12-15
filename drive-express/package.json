@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "seed": "ts-node prisma/seed.js",
+    "seed-test": "node prisma/seed-test.js",
     "nodemon": "nodemon --exec next dev"
   },
   "prisma": {
