@@ -3,22 +3,20 @@ services:
     image: node:18-alpine
     working_dir: /app
     ports:
-      - "3000:3000"
+      - "5555:5555" 
+      - "3000:3000" 
     volumes:
-      - .:/app
-      - node_modules:/app/node_modules
-      - next-cache:/app/.next
+      - .:/app                   
+      - /app/node_modules         
+      - next-cache:/app/.next    
     environment:
       - NODE_ENV=development
       - DATABASE_URL=mysql://myuser:mypassword@db:3306/mydatabase
     command: >
           sh -c "
-            echo 'Installing dependencies...' &&
             npm install &&
-            npm install next@latest &&
-            echo 'Starting development server...' &&
-            npx next dev"
-
+            npm run nodemon
+          "                        
     depends_on:
       - db
 
@@ -45,6 +43,5 @@ services:
       - db
 
 volumes:
-  node_modules:
-  next-cache:
-  mysql_data:
+  next-cache: 
+  mysql_data: 
