@@ -14,15 +14,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-gray-100">
         {/* ClientWrapper permet d'utiliser le SessionProvider côté client */}
         <ClientWrapper>
-          {/* Header Global */}
           <header className="bg-white shadow p-4 flex justify-between items-center">
             <h1 className="text-2xl font-bold text-blue-600">
               <Link href="/">Drive Express</Link>
             </h1>
-            {/* Menu utilisateur */}
             <AccountMenu />
           </header>
-          {/* Contenu des pages */}
           <main>{children}</main>
         </ClientWrapper>
       </body>
