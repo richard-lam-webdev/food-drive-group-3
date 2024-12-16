@@ -14,6 +14,7 @@ export default function AccountMenu() {
 
   return (
     <div className="flex space-x-4 items-center">
+      {/* Si l'utilisateur n'est pas connecté */}
       {!session ? (
         <>
           <Link href="/register" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
@@ -25,19 +26,27 @@ export default function AccountMenu() {
         </>
       ) : (
         <>
-          <Link href="/dashboard" className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
-            Dashboard
-          </Link>
+          {/* Si l'utilisateur est ADMIN */}
+          {session.user.role === "admin" && (
+            <Link href="/dashboard" className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+              Dashboard
+            </Link>
+          )}
+
+          {/* Liens disponibles à tous les utilisateurs */}
           <Link href="/profile" className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
             Voir mon profil
           </Link>
-          <button onClick={() => signOut({ callbackUrl: "/" })} 
-          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+          <button
+            onClick={() => signOut({ callbackUrl: "/" })}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+          >
             Se déconnecter
           </button>
         </>
       )}
 
+      {/* Bouton Panier */}
       <button onClick={() => setIsCartOpen(true)} className="relative">
         <Image src="/icon/Panier.png" alt="Panier" width={30} height={30} />
         {cartItems.length > 0 && (
@@ -47,6 +56,7 @@ export default function AccountMenu() {
         )}
       </button>
 
+      {/* Modale Panier */}
       {isCartOpen && <CartModal cartItems={cartItems} onClose={() => setIsCartOpen(false)} updateCart={updateCart} />}
     </div>
   );
