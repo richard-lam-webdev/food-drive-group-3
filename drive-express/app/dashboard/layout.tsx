@@ -4,7 +4,6 @@ import Link from 'next/link';
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen">
-      {/* Sidebar */}
       <aside className="w-64 bg-green-900 text-white p-6">
         <h1 className="text-2xl font-bold mb-6">Drive Express</h1>
         <nav>
@@ -48,9 +47,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
       </aside>
 
-      {/* Contenu principal */}
       <main className="flex-1 p-8 bg-gray-50">
-        {children} {/* Ceci est le contenu spécifique à chaque page */}
+        {children}
       </main>
     </div>
   );
