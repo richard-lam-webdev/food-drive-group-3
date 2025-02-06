@@ -1,15 +1,35 @@
-import prisma from '@/lib/prisma';
-import { NextResponse } from 'next/server';
+import prisma from "@/lib/prisma";
+import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
-    const products = await prisma.produits.findMany({
-      include: { Categories: true }, // Inclure les catégories pour affichage complet
-    });
+    const { searchParams } = new URL(req.url);
+    const category = searchParams.get("category"); // Récupérer la catégorie depuis l'URL
+
+    let products;
+
+    if (category) {
+      // Récupérer les produits d'une catégorie spécifique
+      products = await prisma.produits.findMany({
+        where: {
+          Categories: {
+            nom: category, // Filtre par nom de catégorie
+          },
+        },
+        include: { Categories: true }, // Inclure les détails de la catégorie
+      });
+    } else {
+      // Récupérer tous les produits
+      products = await prisma.produits.findMany({
+        include: { Categories: true },
+      });
+    }
+
     return NextResponse.json(products);
   } catch (error) {
+    console.error("Erreur API /products :", error);
     return NextResponse.json(
-      { error: 'Erreur lors de la récupération des produits' },
+      { error: "Erreur lors de la récupération des produits" },
       { status: 500 }
     );
   }
@@ -43,9 +63,9 @@ export async function POST(req: Request) {
 
     return NextResponse.json(product);
   } catch (error) {
-    console.error('Erreur POST:', error);
+    console.error("Erreur POST:", error);
     return NextResponse.json(
-      { error: 'Erreur lors de l’ajout du produit' },
+      { error: "Erreur lors de l’ajout du produit" },
       { status: 500 }
     );
   }

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Image from "next/image";
 import { useCart } from "@/context/CartContext";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
 export default function ProductCard({ product }: { product: any }) {
   const { cartItems, addToCart, updateCart } = useCart();
