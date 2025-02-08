@@ -13,6 +13,7 @@ interface CartContextType {
   cartItems: CartItem[];
   addToCart: (product: CartItem) => void;
   updateCart: (id: number, delta: number) => void;
+  removeFromCart: (id: number) => void;  // <--- On ajoute cette méthode
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -26,7 +27,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       const exists = prev.find((item) => item.id === product.id);
       if (exists) {
         return prev.map((item) =>
-          item.id === product.id ? { ...item, quantite: item.quantite + 1 } : item
+          item.id === product.id
+            ? { ...item, quantite: item.quantite + 1 }
+            : item
         );
       }
       return [...prev, { ...product, quantite: 1 }];
@@ -38,14 +41,23 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setCartItems((prev) =>
       prev
         .map((item) =>
-          item.id === id ? { ...item, quantite: item.quantite + delta } : item
+          item.id === id
+            ? { ...item, quantite: item.quantite + delta }
+            : item
         )
         .filter((item) => item.quantite > 0)
     );
   };
 
+  // Supprimer complètement un produit du panier
+  const removeFromCart = (id: number) => {
+    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, updateCart }}>
+    <CartContext.Provider
+      value={{ cartItems, addToCart, updateCart, removeFromCart }}
+    >
       {children}
     </CartContext.Provider>
   );

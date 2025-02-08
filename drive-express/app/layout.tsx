@@ -4,6 +4,7 @@ import ClientWrapper from "../components/ClientWrapper";
 import { CartProvider } from "@/context/CartContext";
 import "./globals.css";
 
+
 export const metadata = {
   title: "Drive Alimentaire",
   description: "Simplifiez vos courses avec notre Drive Alimentaire",
