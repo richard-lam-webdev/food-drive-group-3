@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCart } from "@/context/CartContext";
@@ -48,15 +49,14 @@ export default function PanierPage() {
       <div className="bg-white shadow rounded-lg p-4 mb-6">
         {cartItems.length > 0 ? (
           cartItems.map((item) => (
-            <div
-              key={item.id}
-              className="flex justify-between items-center border-b py-4"
-            >
-              <div className="flex items-center space-x-4">
-                <img
+            <div key={item.id} className="border-b py-4">
+              <div className="flex justify-between items-center">
+                <Image
                   src="/icon/product.png"
                   alt={item.nom}
-                  className="w-16 h-16 object-cover rounded"
+                  width={64}
+                  height={64}
+                  className="object-cover rounded"
                 />
                 <div>
                   <p className="font-bold">{item.nom}</p>
@@ -66,7 +66,6 @@ export default function PanierPage() {
                   </p>
                 </div>
               </div>
-
               <div className="flex items-center space-x-4">
                 {/* Boutons de modification */}
                 <button
@@ -82,7 +81,6 @@ export default function PanierPage() {
                 >
                   +
                 </button>
-
                 {/* Bouton de suppression */}
                 <button
                   onClick={() => removeFromCart(item.id)}
@@ -91,7 +89,6 @@ export default function PanierPage() {
                   🗑️
                 </button>
               </div>
-
               <p className="font-bold">
                 {(item.prix * item.quantite).toFixed(2)} €
               </p>
@@ -142,7 +139,7 @@ export default function PanierPage() {
                 onClick={() => router.push("/register")}
                 className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
               >
-                S'inscrire
+                S&apos;inscrire
               </button>
             </div>
           </div>

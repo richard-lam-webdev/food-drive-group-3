@@ -3,20 +3,22 @@ services:
     image: node:18-alpine
     working_dir: /app
     ports:
-      - "5555:5555" 
-      - "3000:3000" 
+      - "5555:5555"
+      - "3000:3000"
     volumes:
-      - .:/app                   
-      - /app/node_modules         
-      - next-cache:/app/.next    
+      - .:/app
+      - /app/node_modules
+      - next-cache:/app/.next
     environment:
-      - NODE_ENV=development
-      - DATABASE_URL=mysql://myuser:mypassword@db:3306/mydatabase
+      NODE_ENV: development
+      DATABASE_URL: mysql://myuser:mypassword@db:3306/mydatabase
+      NEXTAUTH_SECRET: 1162e2bd67bd6e558dc59e4aa23f6630831f6752145352cf8504ea8db5f77228
+      NEXTAUTH_URL: http://localhost:3000
     command: >
-          sh -c "
-            npm install &&
-            npm run dev
-          "                        
+      sh -c "
+        npm install &&
+        npm run dev
+      "
     depends_on:
       - db
 
@@ -37,11 +39,11 @@ services:
     ports:
       - "8080:80"
     environment:
-      - PMA_HOST=db
-      - MYSQL_ROOT_PASSWORD=rootpassword
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: rootpassword
     depends_on:
       - db
 
 volumes:
-  next-cache: 
-  mysql_data: 
+  next-cache:
+  mysql_data:

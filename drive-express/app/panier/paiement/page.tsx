@@ -6,23 +6,29 @@ import { useSession } from "next-auth/react";
 import { useCart } from "@/context/CartContext";
 
 export default function PaiementPage() {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const router = useRouter();
   const { cartItems, updateCart } = useCart(); 
   const [subTotal, setSubTotal] = useState(0);
   const fraisLivraison = 5; // ou pas, selon besoin
 
   useEffect(() => {
-    // Redirection si pas connecté ou panier vide
-    if (!session) router.push("/panier");
-    if (cartItems.length === 0) router.push("/panier");
-
+    // Attendre que le chargement soit terminé
+    if (status === "loading") return;
+    console.log(session, cartItems);
+    // Rediriger si pas connecté ou panier vide
+    if (!session || cartItems.length === 0) {
+        console.log(session, cartItems);
+    //   router.push("/panier");
+    }
     const total = cartItems.reduce(
       (acc, item) => acc + item.prix * item.quantite,
       0
     );
     setSubTotal(total);
-  }, [session, cartItems, router]);
+  }, [session, status, cartItems, router]);
+
+  
 
   const handlePayment = () => {
     // ICI, tu feras un appel API pour créer la commande côté serveur.
