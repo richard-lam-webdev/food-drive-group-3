@@ -16,42 +16,45 @@ export const authOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        // Recherche l'utilisateur dans la base de données
         const user = await prisma.utilisateurs.findUnique({
           where: { email: credentials?.email },
         });
-
-        // Vérifie si le mot de passe correspond
         if (user && (await bcrypt.compare(credentials?.password || "", user.password))) {
-          return { id: user.id, email: user.email, name: `${user.prenom} ${user.nom}`, role: user.role };
+          return { 
+            id: user.id, 
+            email: user.email, 
+            name: `${user.prenom} ${user.nom}`, 
+            role: user.role 
+          };
         }
-
-        return null; // Retourne null si les identifiants sont incorrects
+        return null;
       },
     }),
   ],
   callbacks: {
-    async session({ session, token }) {
-      // Ajoute le rôle utilisateur à la session
-      if (token) {
-        session.user.role = token.role;
-      }
-      return session;
-    },
     async jwt({ token, user }) {
-      // Ajoute les données utilisateur au token
+      // Lors de la connexion, ajoutez l'ID dans le token
       if (user) {
+        token.id = user.id;
         token.role = user.role;
       }
       return token;
     },
+    async session({ session, token }) {
+      // Ajoutez l'ID dans la session
+      if (token) {
+        session.user.id = token.id;
+        session.user.role = token.role;
+      }
+      return session;
+    },
   },
   secret: process.env.NEXTAUTH_SECRET,
   session: {
-    strategy: "jwt", // Utilise JWT pour gérer les sessions
+    strategy: "jwt" as const,
   },
+  useSecureCookies: process.env.NODE_ENV === "production",
 };
 
 const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
-

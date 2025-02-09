@@ -14,6 +14,9 @@ services:
       DATABASE_URL: mysql://myuser:mypassword@db:3306/mydatabase
       NEXTAUTH_SECRET: 1162e2bd67bd6e558dc59e4aa23f6630831f6752145352cf8504ea8db5f77228
       NEXTAUTH_URL: http://localhost:3000
+      STRIPE_SECRET_KEY: sk_test_51QqdlPDBg9iVvqAELxZJiU2fzRBbPQ1kBMSxSYR3fo1MGbZDakhOqhoLVaZGu4v0v2M2KC806rC5F9ALq6k5Cr1700ApHInZot
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: pk_test_51QqdlPDBg9iVvqAEcNyRspRoAIYwqdigK7DCluqw0UUgXedpc54Zm9KawStRlNVDcwI4BWXGF6fqgJ4zNLL9HBpj00qyuGg3sp
+      STRIPE_WEBHOOK_SECRET: whsec_06e2d3c77ba397029370a9672bfd8086b566dd4632c64af8468a0a6775295b74
     command: >
       sh -c "
         npm install &&
