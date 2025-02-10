@@ -12,7 +12,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 export default function PaiementPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { cartItems, updateCart } = useCart(); 
+  const { cartItems} = useCart(); 
   const [subTotal, setSubTotal] = useState(0);
   const fraisLivraison = 5; // à ajuster selon vos besoins
 

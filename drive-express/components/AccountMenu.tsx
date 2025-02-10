@@ -48,7 +48,7 @@ export default function AccountMenu() {
 
       {/* Bouton Panier */}
       <button onClick={() => setIsCartOpen(true)} className="relative">
-        <Image src="/icon/Panier.png" alt="Panier" width={30} height={30} />
+        <Image src="/icon/Panier.png" alt="Panier" width={30} height={30} unoptimized  />
         {cartItems.length > 0 && (
           <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
             {cartItems.reduce((total, item) => total + item.quantite, 0)}
