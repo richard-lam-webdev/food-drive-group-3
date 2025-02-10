@@ -59,26 +59,68 @@ export async function POST(request: Request) {
       return new NextResponse("Webhook Error: UserId invalide", { status: 400 });
     }
 
+    let commande;
     try {
-      console.log("Création de la commande dans la DB...");
-      // Création de la commande dans la base de données
-      const commande = await prisma.commandes.create({
-        data: {
-          user_id: parseInt(userId),
-          total: totalAmount,
-          statut: "payee", // Paiement réussi
-          LignesCommandes: {
-            create: cartItems.map(item => ({
-              product_id: item.id,
-              quantite: item.quantite,
-              prix_unitaire: item.prix,
-            })),
-          },
-        },
+      // Vérifier s'il existe déjà une commande en "panier" pour cet utilisateur
+      commande = await prisma.commandes.findFirst({
+        where: { user_id: parseInt(userId), statut: "panier" },
       });
-      console.log("Commande créée :", commande);
+
+      if (commande) {
+        console.log("Commande en cours trouvée, mise à jour de la commande existante...");
+        // Supprimer les anciennes lignes du panier
+        await prisma.lignesCommandes.deleteMany({
+          where: { order_id: commande.id },
+        });
+        // Créer les nouvelles lignes du panier
+        const newLignes = cartItems.map(item => ({
+          order_id: commande.id,
+          product_id: item.id,
+          quantite: item.quantite,
+          prix_unitaire: item.prix,
+        }));
+        await prisma.lignesCommandes.createMany({ data: newLignes });
+        // Recalculer le total
+        const total = cartItems.reduce((acc: number, item: any) => acc + item.prix * item.quantite, 0);
+        // Mettre à jour la commande en changeant son statut en "payee"
+        commande = await prisma.commandes.update({
+          where: { id: commande.id },
+          data: { total, statut: "payee" },
+        });
+      } else {
+        console.log("Aucun panier existant trouvé, création d'une nouvelle commande...");
+        // Créer une nouvelle commande avec le statut "payee"
+        commande = await prisma.commandes.create({
+          data: {
+            user_id: parseInt(userId),
+            total: totalAmount,
+            statut: "payee",
+            LignesCommandes: {
+              create: cartItems.map(item => ({
+                product_id: item.id,
+                quantite: item.quantite,
+                prix_unitaire: item.prix,
+              })),
+            },
+          },
+        });
+      }
+      console.log("Commande créée/mise à jour :", commande);
     } catch (error) {
-      console.error("Erreur lors de la création de la commande dans la DB :", error);
+      console.error("Erreur lors de la création/mise à jour de la commande dans la DB :", error);
+    }
+
+    // Mise à jour du stock pour chaque produit acheté
+    for (const item of cartItems) {
+      try {
+        await prisma.produits.update({
+          where: { id: item.id },
+          data: { quantite_stock: { decrement: item.quantite } },
+        });
+        console.log(`Stock mis à jour pour le produit ${item.id}`);
+      } catch (error) {
+        console.error(`Erreur lors de la mise à jour du stock pour le produit ${item.id}:`, error);
+      }
     }
   }
 

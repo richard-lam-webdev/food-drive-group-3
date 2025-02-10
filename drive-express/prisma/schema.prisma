@@ -126,9 +126,11 @@ enum ImageStatus {
 }
 
 enum CommandeStatus {
+  panier
   en_cours_de_paiement
   payee
   en_preparation
   expediee
   livree
 }
+

@@ -22,7 +22,7 @@ export default function PanierPage() {
     setSubTotal(total);
   }, [cartItems]);
 
-  // Vérifie si l'utilisateur est connecté, sinon popup
+  // Vérifie si l'utilisateur est connecté, sinon affiche un popup
   useEffect(() => {
     if (!session) {
       setIsPopupOpen(true);
@@ -31,11 +31,9 @@ export default function PanierPage() {
 
   const handleNextStep = () => {
     if (!session) {
-      // Forcer l'ouverture du popup si on n'est pas connecté
       setIsPopupOpen(true);
       return;
     }
-    // Si connecté, on passe à l'étape /panier/livraison
     router.push("/panier/livraison");
   };
 
@@ -48,52 +46,59 @@ export default function PanierPage() {
       {/* Liste des produits */}
       <div className="bg-white shadow rounded-lg p-4 mb-6">
         {cartItems.length > 0 ? (
-          cartItems.map((item) => (
-            <div key={item.id} className="border-b py-4">
-              <div className="flex justify-between items-center">
-                <Image
-                  src="/icon/product.png"
-                  alt={item.nom}
-                  width={64}
-                  height={64}
-                  className="object-cover rounded"
-                />
-                <div>
-                  <p className="font-bold">{item.nom}</p>
-                  <p className="text-gray-500">
-                    Prix unitaire : {item.prix.toFixed(2)} € | Quantité :{" "}
-                    {item.quantite}
-                  </p>
+          cartItems.map((item) => {
+            // Vérifier si on peut augmenter la quantité (en fonction du stock)
+            const disablePlus = item.quantite >= item.quantite_stock;
+            return (
+              <div key={item.id} className="border-b py-4">
+                <div className="flex justify-between items-center">
+                  <Image
+                    src="/icon/product.png"
+                    alt={item.nom}
+                    width={64}
+                    height={64}
+                    className="object-cover rounded"
+                  />
+                  <div>
+                    <p className="font-bold">{item.nom}</p>
+                    <p className="text-gray-500">
+                      Prix unitaire : {item.prix.toFixed(2)} € | Quantité :{" "}
+                      {item.quantite}
+                    </p>
+                  </div>
                 </div>
+                <div className="flex items-center space-x-4">
+                  <button
+                    onClick={() => updateCart(item.id, -1)}
+                    className="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300"
+                  >
+                    -
+                  </button>
+                  <span className="text-lg font-bold">{item.quantite}</span>
+                  <button
+                    onClick={() => updateCart(item.id, 1)}
+                    disabled={disablePlus}
+                    className={`px-2 py-1 rounded ${
+                      disablePlus
+                        ? "bg-gray-400 text-gray-700 cursor-not-allowed"
+                        : "bg-green-500 text-white hover:bg-green-600"
+                    }`}
+                  >
+                    +
+                  </button>
+                  <button
+                    onClick={() => removeFromCart(item.id)}
+                    className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                  >
+                    🗑️
+                  </button>
+                </div>
+                <p className="font-bold">
+                  {(item.prix * item.quantite).toFixed(2)} €
+                </p>
               </div>
-              <div className="flex items-center space-x-4">
-                {/* Boutons de modification */}
-                <button
-                  onClick={() => updateCart(item.id, -1)}
-                  className="bg-gray-200 px-2 py-1 rounded hover:bg-gray-300"
-                >
-                  -
-                </button>
-                <span className="text-lg font-bold">{item.quantite}</span>
-                <button
-                  onClick={() => updateCart(item.id, +1)}
-                  className="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600"
-                >
-                  +
-                </button>
-                {/* Bouton de suppression */}
-                <button
-                  onClick={() => removeFromCart(item.id)}
-                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
-                >
-                  🗑️
-                </button>
-              </div>
-              <p className="font-bold">
-                {(item.prix * item.quantite).toFixed(2)} €
-              </p>
-            </div>
-          ))
+            );
+          })
         ) : (
           <p className="text-center text-gray-500">Votre panier est vide.</p>
         )}
@@ -125,8 +130,7 @@ export default function PanierPage() {
             </button>
             <h2 className="text-2xl font-bold mb-4">Connectez-vous</h2>
             <p className="mb-4">
-              Veuillez vous connecter ou vous inscrire pour finaliser votre
-              commande.
+              Veuillez vous connecter ou vous inscrire pour finaliser votre commande.
             </p>
             <div className="flex justify-center space-x-4">
               <button
