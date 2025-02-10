@@ -53,9 +53,9 @@ model RecettesTemp {
   id           Int          @id @default(autoincrement())
   user_id      Int
   nom          String
-  description  String?
+  description  String?      @db.Text
   ingredients  String?
-  instructions String?
+  instructions String?      @db.Text
   generated_at DateTime     @default(now())
   Utilisateurs Utilisateurs @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
@@ -133,4 +133,3 @@ enum CommandeStatus {
   expediee
   livree
 }
-

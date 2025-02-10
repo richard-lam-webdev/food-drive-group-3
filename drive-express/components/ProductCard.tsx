@@ -15,8 +15,7 @@ export default function ProductCard({ product }: { product: any }) {
 
   // Désactive le bouton "+" si la quantité dans le panier atteint le stock disponible
   const disablePlus = quantity >= product.quantite_stock;
-  console.log("Stock disponible pour", product.nom, ":", product.quantite_stock);
-
+  
   return (
     <div className="bg-white p-6 rounded-lg shadow-md text-center relative">
       <Image
