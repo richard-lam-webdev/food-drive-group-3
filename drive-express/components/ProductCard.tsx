@@ -2,8 +2,8 @@
 
 import { useCart } from "@/context/CartContext";
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function ProductCard({ product }: { product: any }) {
   const { cartItems, addToCart, updateCart } = useCart();
