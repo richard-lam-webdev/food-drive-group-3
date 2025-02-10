@@ -4,6 +4,7 @@ import CartModal from "@/components/CartModal";
 import CategoriesSection from "@/components/CategoriesSection";
 import FloatingCartButton from "@/components/FloatingCartButton";
 import ProductCard from "@/components/ProductCard";
+import React from "react";
 import { useEffect, useRef, useState } from "react";
 
 export default function Accueil() {
