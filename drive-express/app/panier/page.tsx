@@ -22,7 +22,7 @@ export default function PanierPage() {
     setSubTotal(total);
   }, [cartItems]);
 
-  // Vérifie si l'utilisateur est connecté, sinon affiche un popup
+  // Afficher le popup de connexion si l'utilisateur n'est pas connecté
   useEffect(() => {
     if (!session) {
       setIsPopupOpen(true);
@@ -48,12 +48,13 @@ export default function PanierPage() {
         {cartItems.length > 0 ? (
           cartItems.map((item) => {
             // Vérifier si on peut augmenter la quantité (en fonction du stock)
-            const disablePlus = item.quantite >= item.quantite_stock;
+            const disablePlus = item.quantite >= (item.quantite_stock ?? 0);
             return (
               <div key={item.id} className="border-b py-4">
                 <div className="flex justify-between items-center">
+                  {/* Utilisation de l'ID du produit pour générer le chemin de l'image */}
                   <Image
-                    src="/icon/product.png"
+                    src={`/produits/${item.id}.png`}
                     alt={item.nom}
                     width={64}
                     height={64}

@@ -1,4 +1,5 @@
-'use client';
+// app/dashboard/products/page.tsx
+"use client";
 
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
@@ -16,6 +17,9 @@ export default function Produits() {
     quantite_stock: '',
     categorie_nom: '',
   });
+
+  // Nouvel état pour le fichier image
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   // États pour les catégories
   const [categories, setCategories] = useState([]);
@@ -39,17 +43,32 @@ export default function Produits() {
     fetchCategories();
   }, []);
 
-  // Soumission formulaire produit
+  // Soumission du formulaire produit
   const handleProductSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const method = productForm.id ? 'PUT' : 'POST';
     const url = productForm.id ? `/api/products/${productForm.id}` : '/api/products';
 
-    await fetch(url, {
+    // Créer ou modifier le produit
+    const res = await fetch(url, {
       method,
       body: JSON.stringify(productForm),
       headers: { 'Content-Type': 'application/json' },
     });
+    const data = await res.json();
+
+    // Si un fichier image est sélectionné et que le produit a été créé/mis à jour, on lance l'upload
+    if (imageFile && data.id) {
+      const formData = new FormData();
+      formData.append("productId", data.id);
+      formData.append("image", imageFile);
+
+      await fetch("/api/products/upload-image", {
+        method: "POST",
+        body: formData,
+      });
+      setImageFile(null);
+    }
 
     fetchProducts();
     setProductForm({
@@ -133,6 +152,19 @@ export default function Produits() {
             </option>
           ))}
         </select>
+        {/* Champ d'upload d'image */}
+        <input
+          id="file-input" 
+          type="file"
+          accept="image/png, image/jpeg"
+          onChange={(e) => {
+            if (e.target.files && e.target.files[0]) {
+              setImageFile(e.target.files[0]);
+            }
+          }}
+          className="block p-2 border rounded w-full"
+        />
+
         <button className="px-4 py-2 bg-blue-600 text-white rounded">
           {productForm.id ? 'Modifier' : 'Ajouter'}
         </button>
