@@ -42,3 +42,37 @@ export async function sendConfirmationEmail(to: string, commandeId: number) {
     console.error("Erreur lors de l'envoi de l'email:", error);
   }
 }
+
+export async function sendMissingIngredientsEmail(to: string, ingredients: string[]) {
+  try {
+    const request = await mailjetClient.post("send", { version: "v3.1" }).request({
+      Messages: [
+        {
+          From: {
+            Email: "driveexpresseemi@gmail.com",
+            Name: "Drive Express",
+          },
+          To: [
+            {
+              Email: to,
+              Name: "",
+            },
+          ],
+          Subject: "⚠️ Ingrédients manquants détectés",
+          TextPart: `Les ingrédients suivants ne sont pas présents en base de données :\n${ingredients.join("\n")}`,
+          HTMLPart: `
+            <h3>⚠️ Ingrédients manquants détectés</h3>
+            <p>Les ingrédients suivants ne sont pas présents en base :</p>
+            <ul>
+              ${ingredients.map((ing) => `<li><strong>${ing}</strong></li>`).join("")}
+            </ul>
+            <p>Merci de les ajouter si nécessaire.</p>
+          `,
+        },
+      ],
+    });
+    console.log("📧 Email d'alerte envoyé aux admins :", request.body);
+  } catch (error) {
+    console.error("❌ Erreur lors de l'envoi de l'email d'ingrédients manquants :", error);
+  }
+}

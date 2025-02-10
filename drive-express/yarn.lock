@@ -319,13 +319,6 @@
   resolved "https://registry.npmjs.org/@types/json5/-/json5-0.0.29.tgz"
   integrity sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==
 
-"@types/node-mailjet@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.npmjs.org/@types/node-mailjet/-/node-mailjet-4.0.0.tgz"
-  integrity sha512-BoRchpkPegTg5jKmIWGMjdu6J3JuWBeffs/VlJvJV8b/sFIIXWYg7Qkbi1sEl24G2zxRpYBiGyRG7yB1iWU0xg==
-  dependencies:
-    node-mailjet "*"
-
 "@types/node-fetch@^2.6.4":
   version "2.6.12"
   resolved "https://registry.npmjs.org/@types/node-fetch/-/node-fetch-2.6.12.tgz"
@@ -333,6 +326,13 @@
   dependencies:
     "@types/node" "*"
     form-data "^4.0.0"
+
+"@types/node-mailjet@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.npmjs.org/@types/node-mailjet/-/node-mailjet-4.0.0.tgz"
+  integrity sha512-BoRchpkPegTg5jKmIWGMjdu6J3JuWBeffs/VlJvJV8b/sFIIXWYg7Qkbi1sEl24G2zxRpYBiGyRG7yB1iWU0xg==
+  dependencies:
+    node-mailjet "*"
 
 "@types/node@*", "@types/node@>=8.1.0", "@types/node@22.9.0":
   version "22.9.0"
