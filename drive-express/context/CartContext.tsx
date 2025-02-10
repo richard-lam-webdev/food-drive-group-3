@@ -1,12 +1,11 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 export interface CartItem {
   id: number;
   nom: string;
-  prix: number;
   quantite: number;
   quantite_stock?: number; // Pour vérifier le stock
 }
