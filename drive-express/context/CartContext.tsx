@@ -3,16 +3,15 @@
 import React, { createContext, useContext, useState } from "react";
 
 interface CartItem {
-  id: number;
+  id: string;
   nom: string;
-  prix: number;
   quantite: number;
+  prix: number;
 }
 
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (product: CartItem) => void;
-  updateCart: (id: number, delta: number) => void;
+  addIngredientsToCart: (ingredients: string[]) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -20,32 +19,30 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  // Ajouter un produit au panier
-  const addToCart = (product: CartItem) => {
+  const addIngredientsToCart = (ingredients: string[]) => {
     setCartItems((prev) => {
-      const exists = prev.find((item) => item.id === product.id);
-      if (exists) {
-        return prev.map((item) =>
-          item.id === product.id ? { ...item, quantite: item.quantite + 1 } : item
-        );
-      }
-      return [...prev, { ...product, quantite: 1 }];
+      const updatedCart = [...prev];
+
+      ingredients.forEach((ingredient) => {
+        const existingItem = updatedCart.find((item) => item.nom === ingredient);
+        if (existingItem) {
+          existingItem.quantite += 1;
+        } else {
+          updatedCart.push({
+            id: crypto.randomUUID(),
+            nom: ingredient,
+            quantite: 1,
+            prix: 1.5,
+          });
+        }
+      });
+
+      return updatedCart;
     });
   };
 
-  // Mettre à jour la quantité d'un produit
-  const updateCart = (id: number, delta: number) => {
-    setCartItems((prev) =>
-      prev
-        .map((item) =>
-          item.id === id ? { ...item, quantite: item.quantite + delta } : item
-        )
-        .filter((item) => item.quantite > 0)
-    );
-  };
-
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, updateCart }}>
+    <CartContext.Provider value={{ cartItems, addIngredientsToCart }}>
       {children}
     </CartContext.Provider>
   );
