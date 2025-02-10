@@ -7,7 +7,7 @@ export interface CartItem {
   id: number;
   nom: string;
   quantite: number;
-  quantite_stock?: number; // Pour vérifier le stock
+  quantite_stock?: number;
 }
 
 export interface CartContextType {
@@ -16,6 +16,7 @@ export interface CartContextType {
   updateCart: (id: number, delta: number) => void;
   removeFromCart: (id: number) => void;
   loadCart: () => void;
+  addIngredientsToCart: (ingredients: string[]) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -94,6 +95,19 @@ const loadCart = async () => {
     });
   };
 
+  const addIngredientsToCart = (ingredients: string[]) => {
+    setCartItems((prev) => {
+      const newItems = ingredients.map((name, index) => ({
+        id: prev.length + index + 1, // ✅ Générer un ID unique
+        nom: name,
+        quantite: 1,
+      }));
+      const updated = [...prev, ...newItems];
+      syncCartToServer(updated);
+      return updated;
+    });
+  };
+
   const updateCart = (id: number, delta: number) => {
     setCartItems((prev) => {
       const updated = prev
@@ -122,9 +136,7 @@ const loadCart = async () => {
   }, [status]);
 
   return (
-    <CartContext.Provider
-      value={{ cartItems, addToCart, updateCart, removeFromCart, loadCart }}
-    >
+    <CartContext.Provider value={{ cartItems, addToCart, updateCart, removeFromCart, loadCart, addIngredientsToCart }}>
       {children}
     </CartContext.Provider>
   );

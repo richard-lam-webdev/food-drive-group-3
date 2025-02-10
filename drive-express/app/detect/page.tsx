@@ -6,8 +6,10 @@ import { useEffect, useState } from "react";
 
 export default function DetectionPage() {
   const [ingredients, setIngredients] = useState<string[]>([]);
+  const [missingIngredients, setMissingIngredients] = useState<string[]>([]);
   const { addIngredientsToCart } = useCart();
   const [message, setMessage] = useState<string | null>(null);
+  const [reported, setReported] = useState(false);
 
   useEffect(() => {
     const savedIngredients = localStorage.getItem("ingredients");
@@ -32,13 +34,31 @@ export default function DetectionPage() {
     const data = await res.json();
     console.log("📥 Données reçues de l'API :", data);
 
-    setIngredients([...new Set(data.ingredients)]);
+    setIngredients([...new Set(data.foundIngredients)]);
+    setMissingIngredients([...new Set(data.missingIngredients)]);
   };
 
   const handleAddToCart = () => {
     addIngredientsToCart(ingredients);
     setMessage("✅ Ingrédients ajoutés à votre liste de courses !");
     setTimeout(() => setMessage(null), 3000);
+  };
+
+  const handleReportMissingIngredients = async () => {
+    if (reported || missingIngredients.length === 0) return;
+    
+    const res = await fetch("/api/report-missing-ingredients", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ missingIngredients }),
+    });
+
+    if (res.ok) {
+      setReported(true);
+      setMessage("📩 Ingrédients signalés à l'administration.");
+    } else {
+      setMessage("❌ Erreur lors du signalement.");
+    }
   };
 
   return (
@@ -63,6 +83,20 @@ export default function DetectionPage() {
           </button>
 
           {message && <p className="mt-2 text-green-600">{message}</p>}
+        </div>
+      )}
+
+      {missingIngredients.length > 0 && (
+        <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+          ⚠️ Certains ingrédients ne sont pas en base :
+          <ul>
+            {missingIngredients.map((ing, index) => (
+              <li key={index}>- {ing}</li>
+            ))}
+          </ul>
+          <button onClick={handleReportMissingIngredients} className="mt-2 bg-red-500 text-white px-4 py-2 rounded">
+            🚨 Signaler
+          </button>
         </div>
       )}
     </div>
