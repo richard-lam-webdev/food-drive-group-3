@@ -100,7 +100,7 @@ export default function CartModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white w-full max-w-md p-6 rounded-lg shadow-lg">
+      <div className="bg-white w-full max-w-md p-6 rounded-lg shadow-lg max-h-[80vh] overflow-hidden">
         <h2 className="text-2xl font-bold mb-4 text-center">Votre Panier</h2>
 
         {cartItems.length > 0 ? (

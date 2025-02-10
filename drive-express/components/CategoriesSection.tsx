@@ -60,7 +60,7 @@ export default function CategoriesSection() {
                   className="block bg-white p-6 rounded-lg shadow-md text-center transition hover:scale-105"
                 >
                   <Image
-                    src={cat.image_url || "/icon/default-category.png"}
+                    src={`/categories/${cat.id}.png`}
                     alt={cat.nom}
                     width={50}
                     height={50}
