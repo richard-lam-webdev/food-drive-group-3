@@ -8,6 +8,7 @@ export interface CartItem {
   nom: string;
   quantite: number;
   quantite_stock?: number; // Pour vérifier le stock
+  prix: number;
 }
 
 export interface CartContextType {
