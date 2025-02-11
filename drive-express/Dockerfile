@@ -2,17 +2,15 @@
     FROM node:20-alpine AS builder
     WORKDIR /app
     
-    # Installer OpenSSL (pour Prisma et éviter les problèmes liés à libssl)
+    # Installer OpenSSL 
     RUN apk add --no-cache openssl
     
-    # Copier uniquement les fichiers de configuration et installer les dépendances
     COPY package*.json ./
     RUN npm ci
     
-    # Copier le reste du code
     COPY . .
     
-    # Générer le client Prisma (assurez-vous que votre schéma est dans ./prisma/schema.prisma)
+    # Générer le client Prisma 
     RUN npx prisma generate
     
     # Compiler l'application Next.js en production
