@@ -15,6 +15,7 @@ type Product = {
 
 export default function ProductPage() {
   const { id } = useParams(); // Récupère l'ID depuis l'URL
+  console.log("ID récupéré:", id); // Vérifie dans la console
   const router = useRouter();
   const { cartItems, addToCart, updateCart } = useCart();
 
@@ -72,6 +73,7 @@ export default function ProductPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
+      {/* ... le reste de ton code de rendu de la page produit ... */}
       <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-8">
         <div className="flex flex-col items-center mb-8">
           <div className="w-full flex justify-center mb-4">
@@ -95,7 +97,6 @@ export default function ProductPage() {
             Stock disponible : {product.quantite_stock}
           </p>
         </div>
-
         <div className="flex justify-center">
           {quantity === 0 ? (
             <button
