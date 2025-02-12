@@ -20,7 +20,7 @@ export default function ProductCard({ product }: { product: any }) {
 
   // Gère la navigation vers la page produit lors du clic sur la carte
   const handleCardClick = () => {
-    router.push(`/produit/${product.id}`);
+    router.push(`/product/${product.id}`);
   };
 
   // Empêche la propagation de l'événement clic pour les boutons afin d'éviter la navigation

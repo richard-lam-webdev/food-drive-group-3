@@ -1,8 +1,8 @@
 "use client";
 
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartContext";
 
 type Product = {
@@ -11,37 +11,38 @@ type Product = {
   description: string;
   prix: number;
   quantite_stock: number;
-  // Vous pouvez ajouter d'autres champs si nécessaire
 };
 
-export default function ProductPage({ params }: { params: { id: string } }) {
+export default function ProductPage() {
+  const { id } = useParams(); // Récupère l'ID depuis l'URL
   const router = useRouter();
   const { cartItems, addToCart, updateCart } = useCart();
 
-  // Le produit sera chargé depuis l'API
   const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState<number>(0);
 
-  // Récupérer le produit via l'API en fonction de l'ID passé dans l'URL
   useEffect(() => {
     async function fetchProduct() {
       try {
-        const res = await fetch(`/api/products/${params.id}`);
+        const res = await fetch(`/api/products/${id}`);
         if (!res.ok) {
-          throw new Error("Erreur lors de la récupération du produit");
+          throw new Error("Produit non trouvé");
         }
         const data: Product = await res.json();
         setProduct(data);
+        setLoading(false);
       } catch (error) {
         console.error(error);
-        // Si le produit n'est pas trouvé, rediriger vers une page 404 par exemple
+        setError("Impossible de charger le produit");
+        setLoading(false);
         router.push("/404");
       }
     }
-    fetchProduct();
-  }, [params.id, router]);
+    if (id) fetchProduct();
+  }, [id, router]);
 
-  // Mettre à jour la quantité présente dans le panier pour ce produit
   useEffect(() => {
     if (product) {
       const itemInCart = cartItems.find((item) => item.id === product.id);
@@ -49,8 +50,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     }
   }, [cartItems, product]);
 
-  // Si le produit n'est pas encore chargé, afficher un message de chargement
-  if (!product) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-xl text-gray-600">Chargement du produit...</p>
@@ -58,12 +58,21 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-xl text-red-500">{error}</p>
+      </div>
+    );
+  }
+
+  if (!product) return null;
+
   const disablePlus = quantity >= product.quantite_stock;
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-8">
-        {/* Affichage des détails du produit */}
         <div className="flex flex-col items-center mb-8">
           <div className="w-full flex justify-center mb-4">
             <Image
@@ -87,39 +96,25 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           </p>
         </div>
 
-        {/* Section update card pour la gestion du panier */}
         <div className="flex justify-center">
           {quantity === 0 ? (
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                // Lors de l'ajout, on ajoute la propriété "quantite" à 1 pour correspondre au type CartItem
-                addToCart({ ...product, quantite: 1 });
-              }}
+              onClick={() => addToCart({ ...product, quantite: 1 })}
               className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition"
             >
               Ajouter au panier
             </button>
           ) : (
-            <div
-              className="flex items-center justify-center space-x-4"
-              onClick={(e) => e.stopPropagation()}
-            >
+            <div className="flex items-center justify-center space-x-4">
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  updateCart(product.id, -1);
-                }}
+                onClick={() => updateCart(product.id, -1)}
                 className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 transition"
               >
                 -
               </button>
               <span className="text-2xl font-bold">{quantity}</span>
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  updateCart(product.id, 1);
-                }}
+                onClick={() => updateCart(product.id, 1)}
                 disabled={disablePlus}
                 className={`px-4 py-2 rounded transition ${
                   disablePlus
