@@ -68,7 +68,7 @@ export default function Header() {
             {filteredProducts.map((product) => (
               <Link
                 key={product.id}
-                href={`/produit/${product.id}`}
+                href={`/product/${product.id}`}
                 className="block p-2 hover:bg-gray-100"
               >
                 {product.nom}
