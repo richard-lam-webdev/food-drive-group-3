@@ -14,7 +14,6 @@ export default function Utilisateurs() {
     role: '',
   });
 
-   // Fetch utilisateurs
    const fetchUsers = async () => {
     const res = await fetch('/api/users');
     const data = await res.json();
@@ -25,7 +24,6 @@ export default function Utilisateurs() {
     fetchUsers();
   }, []);
 
-  // Soumission du formulaire utilisateur
   const handleUserSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const method = userForm.id ? 'PUT' : 'POST';
@@ -41,7 +39,6 @@ export default function Utilisateurs() {
     setUserForm({ id: null, nom: '', email: '', role: '' });
   };
 
-  // Supprimer utilisateur
   const handleUserDelete = async (id: number) => {
     await fetch('/api/users', {
       method: 'DELETE',
@@ -51,7 +48,6 @@ export default function Utilisateurs() {
     fetchUsers();
   };
 
-  // Modifier utilisateur
   const handleUserEdit = (user: any) => {
     setUserForm({
       id: user.id,
@@ -73,7 +69,6 @@ export default function Utilisateurs() {
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-4">Gestion des Utilisateurs</h1>
 
-      {/* Formulaire d'utilisateur */}
       <form onSubmit={handleUserSubmit} className="space-y-4">
         <input
           type="text"
@@ -99,6 +94,7 @@ export default function Utilisateurs() {
         >
           <option value="">Sélectionnez un rôle</option>
           <option value="admin">Admin</option>
+          <option value="magasinier">Magasinier</option>
           <option value="client">Utilisateur</option>
         </select>
         <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
@@ -106,7 +102,6 @@ export default function Utilisateurs() {
         </button>
       </form>
 
-      {/* Liste des utilisateurs */}
       <table className="w-full mt-8 border-collapse border border-gray-300">
         <thead>
           <tr>

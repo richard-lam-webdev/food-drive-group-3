@@ -37,12 +37,10 @@ export default function Header() {
 
   return (
     <header className="bg-white shadow-md py-4 px-6 flex flex-col md:flex-row md:justify-between items-center gap-4 relative">
-      {/* Logo / Titre */}
       <Link href="/" className="text-2xl font-bold text-blue-600">
         Drive Express
       </Link>
 
-      {/* Barre de recherche */}
       <div className="w-full md:w-1/3 relative">
         <SearchBar onSearch={handleSearch} />
         {showResults && filteredProducts.length > 0 && (
@@ -66,7 +64,6 @@ export default function Header() {
         )}
       </div>
 
-      {/* Menu utilisateur */}
       <div className="flex space-x-4 items-center">
         {!session ? (
           <>
@@ -93,6 +90,14 @@ export default function Header() {
                 Dashboard
               </Link>
             )}
+            {session.user.role === "magasinier" && (
+              <Link
+                href="/magasinier/dashboard"
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+              >
+                Dashboard
+              </Link>
+            )}
             <Link
               href="/profile"
               className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
@@ -109,7 +114,6 @@ export default function Header() {
         )}
       </div>
 
-      {/* Boutons d'icône pour "Mes Commandes" et "Panier" */}
       <div className="flex space-x-4 items-center">
         {session && (
           <Link href="/mes-commandes" className="relative">
@@ -138,7 +142,6 @@ export default function Header() {
         </button>
       </div>
 
-      {/* Modale du panier */}
       {isCartOpen && (
         <CartModal
           cartItems={cartItems}

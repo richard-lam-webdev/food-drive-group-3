@@ -1,8 +1,8 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -21,14 +21,15 @@ export default function Login() {
     if (res?.error) {
       setError("Erreur : Identifiants incorrects.");
     } else {
-      // Récupération de la session utilisateur après connexion
       const session = await fetch("/api/auth/session").then((res) => res.json());
 
       if (session?.user?.role) {
         if (session.user.role === "admin") {
-          router.push("/dashboard"); // Redirection pour admin
+          router.push("/dashboard");
+        } else if (session.user.role === "magasinier") {
+          router.push("/magasinier/dashboard");
         } else if (session.user.role === "client") {
-          router.push("/"); // Redirection pour client
+          router.push("/");
         } else {
           setError("Rôle non reconnu.");
         }
@@ -69,19 +70,3 @@ export default function Login() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

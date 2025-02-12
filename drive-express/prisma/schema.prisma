@@ -100,6 +100,7 @@ model LignesCommandes {
   product_id    Int
   quantite      Int
   prix_unitaire Float
+  flagged       Boolean   @default(false)
   created_at    DateTime  @default(now())
   updated_at    DateTime  @updatedAt
   Produits      Produits  @relation(fields: [product_id], references: [id], onDelete: Cascade)
@@ -129,7 +130,6 @@ enum CommandeStatus {
   panier
   en_cours_de_paiement
   payee
-  en_preparation
-  expediee
-  livree
+  pretelivrable
+  traite
 }
