@@ -81,7 +81,7 @@ export default function CategoriesMagasinier() {
   };
 
   if (status === "loading") return <p>Chargement...</p>;
-  if (!session || !["magasinier", "admin"].includes(session.user.role)) {
+  if (!session || !session.user.role || !["admin", "magasinier"].includes(session.user.role)) {
     return <p>Accès refusé. Veuillez vous connecter en tant que magasinier ou administrateur.</p>;
   }
 

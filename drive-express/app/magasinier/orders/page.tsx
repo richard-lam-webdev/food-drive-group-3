@@ -15,10 +15,12 @@ interface Order {
     quantite: number;
     flagged: boolean;
     Produits: { nom: string };
+    prix_unitaire: number;
   }>;
 }
 
 export default function OrdersPreparation() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data: session } = useSession();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);

@@ -23,6 +23,7 @@ export async function POST(req: Request) {
       status: 201,
     });
   } catch (error) {
+    console.error(error);
     return new Response(JSON.stringify({ error: "Erreur lors de l'inscription" }), {
       status: 400,
     });

@@ -11,6 +11,33 @@ export interface CartItem {
   prix: number;
 }
 
+export interface Produits {
+  id: number;
+  nom: string;
+  description?: string;
+  prix: number;
+  quantite_stock: number;
+}
+
+export interface LignesCommandes {
+  id: number;
+  order_id: number;
+  product_id: number;
+  quantite: number;
+  prix_unitaire: number;
+  flagged: boolean;
+  Produits?: Produits;
+  Commandes?: Commandes;
+}
+
+export interface Commandes {
+  id: number;
+  user_id: number;
+  total: number;
+  statut: string;
+  LignesCommandes?: LignesCommandes[];
+}
+
 export interface CartContextType {
   cartItems: CartItem[];
   addToCart: (product: CartItem) => void;
@@ -24,7 +51,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const { data: session, status } = useSession();
+  const { status } = useSession();
 
   // Fonction pour synchroniser le panier vers le serveur via l'API /api/cart (POST)
   const syncCartToServer = async (items: CartItem[]) => {
@@ -60,8 +87,7 @@ const loadCart = async () => {
     if (res.ok) {
       const data = await res.json();
       if (data.panier && data.panier.LignesCommandes) {
-        // Reconstituer le panier à partir des lignes de commande en incluant les infos produit
-        const items: CartItem[] = data.panier.LignesCommandes.map((ligne: any) => ({
+        const items: CartItem[] = data.panier.LignesCommandes.map((ligne: LignesCommandes) => ({
           id: ligne.product_id,
           nom: ligne.Produits?.nom || "",
           prix: ligne.prix_unitaire,
@@ -99,9 +125,10 @@ const loadCart = async () => {
   const addIngredientsToCart = (ingredients: string[]) => {
     setCartItems((prev) => {
       const newItems = ingredients.map((name, index) => ({
-        id: prev.length + index + 1, // ✅ Générer un ID unique
+        id: prev.length + index + 1, 
         nom: name,
         quantite: 1,
+        prix: 0,
       }));
       const updated = [...prev, ...newItems];
       syncCartToServer(updated);
@@ -134,7 +161,7 @@ const loadCart = async () => {
     if (status === "authenticated") {
       loadCart();
     }
-  }, [status]);
+  }, [status, loadCart]);
 
   return (
     <CartContext.Provider value={{ cartItems, addToCart, updateCart, removeFromCart, loadCart, addIngredientsToCart }}>

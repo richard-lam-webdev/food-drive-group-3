@@ -45,6 +45,7 @@ export default function ImageUploader({ onImageUpload }: { onImageUpload: (file:
         setError(data.error || "Erreur lors de la détection des ingrédients.");
       }
     } catch (err) {
+      console.error("🚨 Erreur lors de la détection des ingrédients :", err);
       setError("Erreur de connexion au serveur.");
     } finally {
       setLoading(false);

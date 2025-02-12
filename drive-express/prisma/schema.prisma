@@ -130,5 +130,7 @@ enum CommandeStatus {
   en_cours_de_paiement
   payee
   pretelivrable
+  expediee
   traite
+  complete
 }

@@ -4,6 +4,12 @@ import ImageUploader from "@/components/ImageUploader";
 import { useCart } from "@/context/CartContext";
 import { useEffect, useState } from "react";
 
+interface DetectResponse {
+  foundIngredients: string[];
+  missingIngredients: string[];
+}
+
+
 export default function DetectionPage() {
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [missingIngredients, setMissingIngredients] = useState<string[]>([]);
@@ -25,18 +31,19 @@ export default function DetectionPage() {
   const handleUpload = async (file: File) => {
     const formData = new FormData();
     formData.append("image", file);
-
+  
     const res = await fetch("/api/detect-ingredients", {
       method: "POST",
       body: formData,
     });
-
-    const data = await res.json();
+  
+    const data = (await res.json()) as DetectResponse;
     console.log("📥 Données reçues de l'API :", data);
-
+  
     setIngredients([...new Set(data.foundIngredients)]);
     setMissingIngredients([...new Set(data.missingIngredients)]);
   };
+  
 
   const handleAddToCart = () => {
     addIngredientsToCart(ingredients);

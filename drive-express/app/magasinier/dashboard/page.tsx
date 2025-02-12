@@ -3,9 +3,16 @@
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 
+interface LowStockProduct {
+  id: number;
+  nom: string;
+  quantite_stock: number;
+}
+
 export default function DashboardMagasinier() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { data: session } = useSession();
-  const [lowStockProducts, setLowStockProducts] = useState<any[]>([]);
+  const [lowStockProducts, setLowStockProducts] = useState<LowStockProduct[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchLowStockProducts = async () => {

@@ -14,7 +14,9 @@ export default function MagasinierProtectedPage({ children }: Props) {
   const router = useRouter();
 
   useEffect(() => {
-    if (status !== "loading" && (!session || !["magasinier", "admin"].includes(session.user.role))) {
+    if (
+      status !== "loading" && (!session || !session.user.role || !["magasinier", "admin"].includes(session.user.role))
+    ) {
       router.push("/unauthorized");
     }
   }, [session, status, router]);

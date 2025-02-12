@@ -1,14 +1,38 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+
+
+interface Product {
+  id: number;
+  nom: string;
+  description: string;
+  prix: number;
+  quantite_stock: number;
+  Categories?: {
+    nom: string;
+  };
+}
+
+interface Category {
+  id: number;
+  nom: string;
+}
+
+interface ProductFormState {
+  id: number | null;
+  nom: string;
+  description: string;
+  prix: string;
+  quantite_stock: string;
+  categorie_nom: string;
+}
 
 export default function ProduitsMagasinier() {
   const { data: session, status } = useSession();
-  const router = useRouter();
-  const [products, setProducts] = useState<any[]>([]);
-  const [productForm, setProductForm] = useState({
+  const [products, setProducts] = useState<Product[]>([]);
+  const [productForm, setProductForm] = useState<ProductFormState>({
     id: null,
     nom: "",
     description: "",
@@ -17,7 +41,7 @@ export default function ProduitsMagasinier() {
     categorie_nom: "",
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const fetchProducts = async () => {
     try {
@@ -93,15 +117,19 @@ export default function ProduitsMagasinier() {
     }
   };
 
-  const handleProductEdit = (product: any) => {
+  const handleProductEdit = (product: Product) => {
     setProductForm({
-      ...product,
+      id: product.id,
+      nom: product.nom,
+      description: product.description,
+      prix: product.prix.toString(),
+      quantite_stock: product.quantite_stock.toString(),
       categorie_nom: product.Categories?.nom || "",
     });
   };
 
   if (status === "loading") return <p>Chargement...</p>;
-  if (!session || !["magasinier", "admin"].includes(session.user.role)) {
+  if (!session || !session.user.role || !["admin", "magasinier"].includes(session.user.role)) {
     return <p>Accès refusé. Veuillez vous connecter en tant que magasinier ou administrateur.</p>;
   }
 
@@ -190,7 +218,7 @@ export default function ProduitsMagasinier() {
             required
           >
             <option value="">Sélectionnez une catégorie</option>
-            {categories.map((category: any) => (
+            {categories.map((category: Category) => (
               <option key={category.id} value={category.nom}>
                 {category.nom}
               </option>
@@ -232,7 +260,7 @@ export default function ProduitsMagasinier() {
           </tr>
         </thead>
         <tbody>
-          {products.map((product: any) => (
+          {products.map((product: Product) => (
             <tr key={product.id}>
               <td className="border px-4 py-2">{product.nom}</td>
               <td className="border px-4 py-2">{product.description}</td>

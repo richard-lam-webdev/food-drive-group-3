@@ -3,11 +3,23 @@
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 
+interface User {
+  id: number;
+  nom: string;
+  email: string;
+  role: string;
+}
+
 export default function Utilisateurs() {
   const { data: session, status } = useSession();
 
-  const [users, setUsers] = useState([]);
-  const [userForm, setUserForm] = useState({
+  const [users, setUsers] = useState<User[]>([]);
+  const [userForm, setUserForm] = useState<{
+    id: number | null;
+    nom: string;
+    email: string;
+    role: string;
+  }>({
     id: null,
     nom: '',
     email: '',
@@ -48,7 +60,7 @@ export default function Utilisateurs() {
     fetchUsers();
   };
 
-  const handleUserEdit = (user: any) => {
+  const handleUserEdit = (user: User) => {
     setUserForm({
       id: user.id,
       nom: user.nom,
@@ -112,7 +124,7 @@ export default function Utilisateurs() {
           </tr>
         </thead>
         <tbody>
-          {users.map((user: any) => (
+          {users.map((user: User) => (
             <tr key={user.id}>
               <td className="border px-4 py-2">{user.nom}</td>
               <td className="border px-4 py-2">{user.email}</td>

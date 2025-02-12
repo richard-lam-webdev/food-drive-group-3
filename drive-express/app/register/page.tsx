@@ -26,6 +26,7 @@ export default function Register() {
         alert(data.error || 'Une erreur est survenue lors de l\'inscription.');
       }
     } catch (err) {
+      console.error('Erreur lors de l\'inscription :', err);
       alert('Une erreur inattendue est survenue. Veuillez réessayer.');
     } finally {
       setIsSubmitting(false);

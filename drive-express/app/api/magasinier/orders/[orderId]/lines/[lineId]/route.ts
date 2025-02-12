@@ -1,20 +1,19 @@
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
-import { authOptions } from "../../../../../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 
 const prisma = new PrismaClient();
 
 export async function PATCH(
   request: Request,
-  context: { params: { orderId: string; lineId: string } }
+  { params }: { params: Promise<{ orderId: string; lineId: string }> }
 ) {
-  // Attendre les paramètres avant de les utiliser
-  const resolvedParams = await Promise.resolve(context.params);
-  const { orderId, lineId } = resolvedParams;
+  // Attendre la résolution des paramètres
+  const { orderId, lineId } = await params;
 
   const session = await getServerSession(authOptions);
-  if (!session || !["admin", "magasinier"].includes(session.user.role)) {
+  if (!session || !session.user.role || !["admin", "magasinier"].includes(session.user.role)) {
     return NextResponse.json({ error: "Accès non autorisé" }, { status: 401 });
   }
 

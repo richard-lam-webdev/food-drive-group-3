@@ -5,8 +5,13 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
+interface Category {
+  id: number;
+  nom: string;
+}
+
 export default function CategoriesSection() {
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const carouselRef = useRef<HTMLDivElement>(null);
 
   // Charger les catégories via l'API existante (/api/categories)

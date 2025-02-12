@@ -9,12 +9,26 @@ import { useCallback, useState } from "react";
 import CartModal from "./CartModal";
 import SearchBar from "./SearchBar";
 
+interface Category {
+  id: number;
+  nom: string;
+}
+
+interface Product {
+  id: number;
+  nom: string;
+  prix: number;
+  description: string;
+  quantite_stock: number;
+  Categories?: Category;
+}
+
 export default function Header() {
   const { data: session } = useSession();
   const { cartItems } = useCart();
   const { products } = useProducts();
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [showResults, setShowResults] = useState(false);
 
   const handleSearch = useCallback(
@@ -71,7 +85,7 @@ export default function Header() {
               href="/register"
               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
             >
-              M'inscrire
+              M&apos;inscrire
             </Link>
             <Link
               href="/login"
@@ -142,12 +156,7 @@ export default function Header() {
         </button>
       </div>
 
-      {isCartOpen && (
-        <CartModal
-          cartItems={cartItems}
-          onClose={() => setIsCartOpen(false)}
-        />
-      )}
+      {isCartOpen && <CartModal onClose={() => setIsCartOpen(false)} />}     
     </header>
   );
 }

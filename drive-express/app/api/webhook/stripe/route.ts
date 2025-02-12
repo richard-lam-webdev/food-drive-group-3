@@ -1,25 +1,37 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 import { sendConfirmationEmail } from "@/lib/mailjet";
-import { Console } from "console";
 
-console.log("Webhook");
-// Initialisation de Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2022-11-15",
+// Déclaration des types
+interface CartItem {
+  id: string | number;
+  quantite: number;
+  prix: number;
+}
+
+interface StripeMetadata {
+  userId?: string;
+  cartItems?: string;
+}
+
+// Vérification de la clé Stripe
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+if (!stripeSecretKey) {
+  throw new Error('STRIPE_SECRET_KEY is not defined');
+}
+
+const stripe = new Stripe(stripeSecretKey, {
+  apiVersion: "2024-09-30.acacia",
 });
-const prisma = new PrismaClient();
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
 
 export async function POST(request: Request) {
   const rawBody = await request.text();
-  const sig = request.headers.get("stripe-signature")!;
+  const sig = request.headers.get("stripe-signature");
+
+  if (!sig) {
+    return new NextResponse("Signature manquante", { status: 400 });
+  }
 
   let event: Stripe.Event;
   try {
@@ -28,98 +40,82 @@ export async function POST(request: Request) {
       sig,
       process.env.STRIPE_WEBHOOK_SECRET!
     );
-  } catch (err: any) {
-    console.error("Erreur lors de la vérification du webhook Stripe :", err.message);
-    return new NextResponse("Webhook Error", { status: 400 });
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error("Erreur inconnue");
+    console.error("Erreur de vérification webhook:", error.message);
+    return new NextResponse(`Webhook Error: ${error.message}`, { status: 400 });
   }
 
   if (event.type === "checkout.session.completed") {
-    console.log("Session de paiement complétée !");
     const checkoutSession = event.data.object as Stripe.Checkout.Session;
+    const metadata = checkoutSession.metadata as StripeMetadata;
 
-    const userId = checkoutSession.metadata?.userId;
-    const cartItemsJSON = checkoutSession.metadata?.cartItems;
-    let cartItems: any[] = [];
-    if (cartItemsJSON) {
-      try {
-        cartItems = JSON.parse(cartItemsJSON);
-      } catch (error) {
-        console.error("Erreur lors du parsing des cartItems :", error);
-      }
+    // Validation des métadonnées
+    if (!metadata?.userId || !metadata.cartItems) {
+      console.error("Métadonnées incomplètes");
+      return new NextResponse("Données de commande invalides", { status: 400 });
     }
 
-    const totalAmount = checkoutSession.amount_total ? checkoutSession.amount_total / 100 : 0;
-    console.log("Commande payée :", totalAmount);
-
-    if (!userId || isNaN(parseInt(userId))) {
-      console.error("UserId invalide :", userId);
-      return new NextResponse("Webhook Error: UserId invalide", { status: 400 });
-    }
-
-    let commande;
     try {
-      // Rechercher un panier existant
-      commande = await prisma.commandes.findFirst({
-        where: { user_id: parseInt(userId), statut: "panier" },
-      });
-      if (commande) {
-        console.log("Commande en cours trouvée, mise à jour de la commande existante...");
-        await prisma.lignesCommandes.deleteMany({
-          where: { order_id: commande.id },
+      // Conversion des données
+      const userId = parseInt(metadata.userId, 10);
+      const cartItems: CartItem[] = JSON.parse(metadata.cartItems);
+      const totalAmount = checkoutSession.amount_total ? checkoutSession.amount_total / 100 : 0;
+
+      // Gestion de la commande
+      const commande = await prisma.$transaction(async (tx) => {
+        // Recherche ou création de la commande
+        let commande = await tx.commandes.findFirst({
+          where: { user_id: userId, statut: "panier" },
         });
-        const newLignes = cartItems.map(item => ({
-          order_id: commande.id,
-          product_id: item.id,
-          quantite: item.quantite,
-          prix_unitaire: item.prix,
-        }));
-        await prisma.lignesCommandes.createMany({ data: newLignes });
-        const total = cartItems.reduce((acc: number, item: any) => acc + item.prix * item.quantite, 0);
-        commande = await prisma.commandes.update({
-          where: { id: commande.id },
-          data: { total, statut: "payee" },
-        });
-      } else {
-        console.log("Aucun panier existant trouvé, création d'une nouvelle commande...");
-        commande = await prisma.commandes.create({
-          data: {
-            user_id: parseInt(userId),
-            total: totalAmount,
-            statut: "payee",
-            LignesCommandes: {
-              create: cartItems.map(item => ({
-                product_id: item.id,
-                quantite: item.quantite,
-                prix_unitaire: item.prix,
-              })),
+
+        if (commande) {
+          await tx.lignesCommandes.deleteMany({ where: { order_id: commande.id } });
+        } else {
+          commande = await tx.commandes.create({
+            data: {
+              user_id: userId,
+              total: totalAmount,
+              statut: "payee",
             },
-          },
+          });
+        }
+
+        // Création des lignes de commande
+        await tx.lignesCommandes.createMany({
+          data: cartItems.map(item => ({
+            order_id: commande.id,
+            product_id: Number(item.id),
+            quantite: item.quantite,
+            prix_unitaire: item.prix,
+          })),
         });
+
+        // Mise à jour du stock
+        await Promise.all(
+          cartItems.map(item =>
+            tx.produits.update({
+              where: { id: Number(item.id) },
+              data: { quantite_stock: { decrement: item.quantite } },
+            })
+          )
+        );
+
+        return tx.commandes.update({
+          where: { id: commande.id },
+          data: { total: cartItems.reduce((acc, item) => acc + item.prix * item.quantite, 0) },
+          include: { LignesCommandes: true },
+        });
+      });
+
+      // Envoi d'email
+      if (checkoutSession.customer_email) {
+        await sendConfirmationEmail(checkoutSession.customer_email, commande.id);
       }
-      console.log("Commande créée/mise à jour :", commande);
+
     } catch (error) {
-      console.error("Erreur lors de la création/mise à jour de la commande dans la DB :", error);
-    }
-
-    // Mise à jour du stock
-    for (const item of cartItems) {
-      try {
-        await prisma.produits.update({
-          where: { id: item.id },
-          data: { quantite_stock: { decrement: item.quantite } },
-        });
-        console.log(`Stock mis à jour pour le produit ${item.id}`);
-      } catch (error) {
-        console.error(`Erreur lors de la mise à jour du stock pour le produit ${item.id}:`, error);
-      }
-    }
-
-    // Envoi de l'e-mail de confirmation
-    console.log("Envoi de l'e-mail de confirmation...");
-    console.log("checkoutSession.customer_email", checkoutSession.customer_email);
-    console.log("commande.id", commande.id);
-    if (commande && checkoutSession.customer_email) {
-      sendConfirmationEmail(checkoutSession.customer_email, commande.id);
+      console.error("Erreur de traitement:", error);
+      return new NextResponse("Erreur de traitement", { status: 500 });
     }
   }
 

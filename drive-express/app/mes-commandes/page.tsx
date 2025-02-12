@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 interface Order {
   id: number;
@@ -26,13 +26,14 @@ export default function MesCommandesPage() {
   const [loading, setLoading] = useState(true);
 
   // Récupérer les commandes du client (en passant par un paramètre clientId)
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
-      const res = await fetch("/api/orders?clientId=" + session.user.id, {
+      const res = await fetch("/api/orders?clientId=" + session?.user?.id, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       });
+
       if (res.ok) {
         const data = await res.json();
         setOrders(data.orders);
@@ -44,13 +45,13 @@ export default function MesCommandesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [session?.user?.id]); // Dépendance sur l'ID utilisateur
 
   useEffect(() => {
     if (status === "authenticated") {
       fetchOrders();
     }
-  }, [status]);
+  }, [status, fetchOrders])
 
   // Fonction pour finaliser la commande en passant son statut à "traite"
   const handleCompleteOrder = async (orderId: number) => {
@@ -114,7 +115,7 @@ export default function MesCommandesPage() {
                 onClick={() => handleCompleteOrder(order.id)}
                 className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
               >
-                J'ai récupéré ma commande
+                J&apos;ai récupéré ma commande
               </button>
             )}
           </div>

@@ -5,7 +5,17 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function ProductCard({ product }: { product: any }) {
+
+
+interface Product {
+  id: number;
+  nom: string;
+  prix: number;
+  description: string;
+  quantite_stock: number;
+}
+
+export default function ProductCard({ product }: { product: Product }) {
   const { cartItems, addToCart, updateCart } = useCart();
   const [quantity, setQuantity] = useState(0);
   const router = useRouter();
@@ -56,7 +66,7 @@ export default function ProductCard({ product }: { product: any }) {
         <button
           onClick={(e) => {
             stopPropagation(e);
-            addToCart(product);
+            addToCart({ ...product, quantite: 1 });
           }}
           className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition"
         >

@@ -7,27 +7,32 @@ import ProductCard from "@/components/ProductCard";
 import React from "react";
 import { useEffect, useRef, useState } from "react";
 
+interface Category {
+  id: number;
+  nom: string;
+}
+
+interface Product {
+  id: number;
+  nom: string;
+  prix: number;
+  description: string;
+  quantite_stock: number;
+  Categories?: Category;
+}
+
 export default function Accueil() {
-  const [products, setProducts] = useState<any[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
-  const [cartItems, setCartItems] = useState<any[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [productsByCategory, setProductsByCategory] = useState<any>({});
-  const [categories, setCategories] = useState<string[]>([]);
-  const carouselRefs = useRef<any[]>([]);
+  const carouselRefs = useRef<React.RefObject<HTMLDivElement>[]>([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       const res = await fetch("/api/products");
       if (res.ok) {
-        const data = await res.json();
-        setProducts(data);
+        const data: Product[] = await res.json();
         setFilteredProducts(data);
         groupProductsByCategory(data);
-
-        // Récupérer les catégories uniques
-        const uniqueCategories = [...new Set(data.map((p: any) => p.Categories?.nom))];
-        setCategories(uniqueCategories);
       } else {
         console.error("Erreur lors de la récupération des produits");
       }
@@ -36,43 +41,43 @@ export default function Accueil() {
     fetchProducts();
   }, []);
 
-  // 🔍 Fonction de recherche
-  const handleSearch = (query: string) => {
-    const filtered = products.filter((product) =>
-      product.nom.toLowerCase().includes(query.toLowerCase())
-    );
-    setFilteredProducts(filtered);
-    groupProductsByCategory(filtered);
-  };
 
-  // 🎯 Fonction de filtrage
-  const handleFilter = ({ category, minPrice, maxPrice }: { category?: string; minPrice?: number; maxPrice?: number }) => {
+
+  // 🎯 Fonction de filtrage à faire 
+/*
+  const handleFilter = (filters: { 
+    category?: string; 
+    minPrice?: number; 
+    maxPrice?: number 
+  }) => {
     let filtered = [...products];
-
-    if (category) {
-      filtered = filtered.filter((product) => product.Categories?.nom === category);
+    
+    if (filters.category) {
+      filtered = filtered.filter(
+        product => product.Categories?.nom === filters.category
+      );
     }
 
-    if (minPrice !== undefined) {
-      filtered = filtered.filter((product) => product.prix >= minPrice);
+    if (filters.minPrice !== undefined) {
+      filtered = filtered.filter(product => product.prix >= filters.minPrice!);
     }
 
-    if (maxPrice !== undefined) {
-      filtered = filtered.filter((product) => product.prix <= maxPrice);
+    if (filters.maxPrice !== undefined) {
+      filtered = filtered.filter(product => product.prix <= filters.maxPrice!);
     }
 
     setFilteredProducts(filtered);
     groupProductsByCategory(filtered);
   };
+  */
 
-  const groupProductsByCategory = (products: any[]) => {
-    const grouped = products.reduce((acc: any, product) => {
-      const category = product.Categories?.nom || "Autres";
-      if (!acc[category]) acc[category] = [];
-      acc[category].push(product);
+  const groupProductsByCategory = (products: Product[]) => {
+    const grouped = products.reduce((acc: Record<string, Product[]>, product) => {
+      const categoryName = product.Categories?.nom || "Autres";
+      if (!acc[categoryName]) acc[categoryName] = [];
+      acc[categoryName].push(product);
       return acc;
     }, {});
-    setProductsByCategory(grouped);
     carouselRefs.current = Object.keys(grouped).map(() => React.createRef());
   };
 
@@ -99,17 +104,16 @@ export default function Accueil() {
       <section className="py-16 bg-gray-50">
         <h2 className="text-3xl font-bold text-center mb-6">Nos Produits</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredProducts.map((product: any) => (
+          {filteredProducts.map((product: Product) => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </section>
 
       {/* Bouton flottant du panier */}
-      <FloatingCartButton cartItems={cartItems} onOpen={() => setIsCartOpen(true)} />
+      <FloatingCartButton onOpen={() => setIsCartOpen(true)} />
 
       {/* Modale du panier */}
-      {isCartOpen && <CartModal cartItems={cartItems} onClose={() => setIsCartOpen(false)} />}
-    </div>
+      {isCartOpen && <CartModal onClose={() => setIsCartOpen(false)} />}    </div>
   );
 }

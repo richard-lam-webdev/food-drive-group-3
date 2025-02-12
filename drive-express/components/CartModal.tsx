@@ -5,7 +5,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import RecipeModal from "./RecipeModal";
 
-export default function CartModal({ onClose }: { onClose: () => void }) {
+interface CartModalProps {
+  onClose: () => void;
+}
+
+export default function CartModal({ onClose }: CartModalProps) {
   const { cartItems, updateCart, addToCart } = useCart();
   const router = useRouter();
   const [loadingRecipe, setLoadingRecipe] = useState(false);
