@@ -1,4 +1,3 @@
-// lib/mailjet.ts
 import mailjet from 'node-mailjet';
 
 const mailjetClient = new mailjet({
@@ -8,13 +7,14 @@ const mailjetClient = new mailjet({
 
 export async function sendDispatchEmail(to: string, orderId: number) {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const request = await mailjetClient
       .post("send", { version: "v3.1" })
       .request({
         Messages: [
           {
             From: {
-              Email: "driveexpresseemi@gmail.com", // Utilisez une adresse vérifiée sur Mailjet
+              Email: "driveexpresseemi@gmail.com",
               Name: "Drive Express",
             },
             To: [
