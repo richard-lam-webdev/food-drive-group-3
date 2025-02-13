@@ -27,7 +27,6 @@ export default function ProductCard({ product }: { product: Product }) {
 
   const disablePlus = quantity >= product.quantite_stock;
 
-  // Gère la navigation vers la page produit lors du clic sur la carte
   const handleCardClick = () => {
     router.push(`/product/${product.id}`);
   };

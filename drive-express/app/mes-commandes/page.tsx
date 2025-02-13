@@ -25,7 +25,6 @@ export default function MesCommandesPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Récupérer les commandes du client (en passant par un paramètre clientId)
   const fetchOrders = useCallback(async () => {
     try {
       const res = await fetch("/api/orders?clientId=" + session?.user?.id, {
@@ -45,7 +44,7 @@ export default function MesCommandesPage() {
     } finally {
       setLoading(false);
     }
-  }, [session?.user?.id]); // Dépendance sur l'ID utilisateur
+  }, [session?.user?.id]); 
 
   useEffect(() => {
     if (status === "authenticated") {
@@ -53,7 +52,6 @@ export default function MesCommandesPage() {
     }
   }, [status, fetchOrders])
 
-  // Fonction pour finaliser la commande en passant son statut à "traite"
   const handleCompleteOrder = async (orderId: number) => {
     try {
       const res = await fetch(`/api/orders/${orderId}/complete`, {

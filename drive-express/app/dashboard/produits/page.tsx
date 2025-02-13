@@ -41,7 +41,6 @@ export default function Produits() {
     setProducts(data);
   };
 
-  // Fetch catégories
   const fetchCategories = async () => {
     const res = await fetch('/api/categories');
     const data = await res.json();

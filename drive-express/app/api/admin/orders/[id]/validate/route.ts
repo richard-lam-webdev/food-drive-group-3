@@ -42,13 +42,11 @@ export async function PUT(
       );
     }
 
-    // Mise à jour de la commande
     const updatedOrder = await prisma.commandes.update({
       where: { id: orderId },
       data: { statut: 'expediee' }
     });
 
-    // Envoi d'email avec vérification de sécurité
     if (order.Utilisateurs?.email) {
       await sendDispatchEmail(
         order.Utilisateurs.email,

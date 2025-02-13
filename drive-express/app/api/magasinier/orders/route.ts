@@ -10,7 +10,6 @@ export async function GET() {
   if (!session || !session.user.role || !["admin", "magasinier"].includes(session.user.role)) {
     return NextResponse.json({ error: "Accès non autorisé" }, { status: 401 });
   }
-  // On exclut seulement les commandes qui sont encore en panier ou en cours de paiement.
   const orders = await prisma.commandes.findMany({
     where: { statut: { notIn: ["panier", "en_cours_de_paiement"] } },
     include: {

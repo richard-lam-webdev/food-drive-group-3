@@ -3,7 +3,6 @@
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 
-// Définir le type des statistiques
 interface DashboardStats {
   totalCommandes: number;
   chiffreAffaires: number;

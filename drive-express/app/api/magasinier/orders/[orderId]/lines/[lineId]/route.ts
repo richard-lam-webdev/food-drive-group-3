@@ -9,7 +9,6 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ orderId: string; lineId: string }> }
 ) {
-  // Attendre la résolution des paramètres
   const { orderId, lineId } = await params;
 
   const session = await getServerSession(authOptions);

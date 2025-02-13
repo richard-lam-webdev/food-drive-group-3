@@ -1,7 +1,6 @@
-// app/api/users/getAdresse/route.ts
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth"; // ou "next-auth/next"
-import { authOptions } from "@/lib/authOptions"; // Vérifie le chemin
+import { getServerSession } from "next-auth"; 
+import { authOptions } from "@/lib/authOptions"; 
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();

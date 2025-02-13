@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
 
     const detectedIngredients = response.choices[0]?.message?.content
       ?.split("\n")
-      .map((item) => item.replace(/^\d+\.\s*/, "").trim()) // Nettoyage des numéros
+      .map((item) => item.replace(/^\d+\.\s*/, "").trim()) 
       .filter(Boolean) || [];
 
     const existingIngredients = await prisma.produits.findMany({
