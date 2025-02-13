@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   const body = await req.json();
-  const { email, password, nom, prenom, role = "client" } = body;
+  const { email, password, nom, prenom } = body;
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -16,7 +16,7 @@ export async function POST(req: Request) {
         password: hashedPassword,
         nom,
         prenom,
-        role,
+        role: "client",
       },
     });
     return new Response(JSON.stringify({ message: "Utilisateur créé avec succès", user }), {
