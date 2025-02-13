@@ -4,8 +4,8 @@ import CartModal from "@/components/CartModal";
 import CategoriesSection from "@/components/CategoriesSection";
 import FloatingCartButton from "@/components/FloatingCartButton";
 import ProductCard from "@/components/ProductCard";
-import React from "react";
-import { useEffect, useRef, useState } from "react";
+import Filters from "@/components/Filters"; // Importation du composant Filters
+import React, { useEffect, useRef, useState } from "react";
 
 export default function Accueil() {
   const [products, setProducts] = useState<any[]>([]);
@@ -25,7 +25,7 @@ export default function Accueil() {
         setFilteredProducts(data);
         groupProductsByCategory(data);
 
-        // Récupérer les catégories uniques
+        // Récupérer les catégories uniques (optionnel si déjà récupérées via l'API Categories)
         const uniqueCategories = [...new Set(data.map((p: any) => p.Categories?.nom))];
         setCategories(uniqueCategories);
       } else {
@@ -35,35 +35,6 @@ export default function Accueil() {
 
     fetchProducts();
   }, []);
-
-  // 🔍 Fonction de recherche
-  const handleSearch = (query: string) => {
-    const filtered = products.filter((product) =>
-      product.nom.toLowerCase().includes(query.toLowerCase())
-    );
-    setFilteredProducts(filtered);
-    groupProductsByCategory(filtered);
-  };
-
-  // 🎯 Fonction de filtrage
-  const handleFilter = ({ category, minPrice, maxPrice }: { category?: string; minPrice?: number; maxPrice?: number }) => {
-    let filtered = [...products];
-
-    if (category) {
-      filtered = filtered.filter((product) => product.Categories?.nom === category);
-    }
-
-    if (minPrice !== undefined) {
-      filtered = filtered.filter((product) => product.prix >= minPrice);
-    }
-
-    if (maxPrice !== undefined) {
-      filtered = filtered.filter((product) => product.prix <= maxPrice);
-    }
-
-    setFilteredProducts(filtered);
-    groupProductsByCategory(filtered);
-  };
 
   const groupProductsByCategory = (products: any[]) => {
     const grouped = products.reduce((acc: any, product) => {
@@ -88,25 +59,41 @@ export default function Accueil() {
           <h1 className="text-4xl font-extrabold mb-4 text-center">
             Bienvenue sur Drive Express
           </h1>
-          <p className="text-lg text-center">Faites vos courses en toute simplicité.</p>
+          <p className="text-lg text-center">
+            Faites vos courses en toute simplicité.
+          </p>
         </div>
       </section>
 
-      {/* Categories Section */}
+      {/* Zone de filtres */}
+      <div className="container mx-auto px-4">
+        <Filters products={products} setFilteredProducts={setFilteredProducts} />
+      </div>
+
+      {/* Optionnel : Section des catégories */}
       <CategoriesSection />
 
-      {/* 📦 Produits filtrés */}
+      {/* Produits filtrés */}
       <section className="py-16 bg-gray-50">
         <h2 className="text-3xl font-bold text-center mb-6">Nos Produits</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filteredProducts.map((product: any) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
+          {filteredProducts.length === 0 ? (
+            <p className="text-center text-gray-600 col-span-3">
+              Aucun produit trouvé.
+            </p>
+          ) : (
+            filteredProducts.map((product: any) => (
+              <ProductCard key={product.id} product={product} />
+            ))
+          )}
         </div>
       </section>
 
       {/* Bouton flottant du panier */}
-      <FloatingCartButton cartItems={cartItems} onOpen={() => setIsCartOpen(true)} />
+      <FloatingCartButton
+        cartItems={cartItems}
+        onOpen={() => setIsCartOpen(true)}
+      />
 
       {/* Modale du panier */}
       {isCartOpen && <CartModal cartItems={cartItems} onClose={() => setIsCartOpen(false)} />}
