@@ -19,11 +19,11 @@ Elle permet aux utilisateurs de gérer leurs courses, créer des listes de cours
 
 ## 🛠 Fonctionnalités  
 
- **Création automatique de listes de courses à partir de photos de plats**  
- **Suggestions de recettes basées sur les ingrédients disponibles**  
- **Commande et paiement en ligne sécurisé**  
- **Notifications de commande par email**  
- **Gestion des commandes pour les administrateurs**  
+ - **Création automatique de listes de courses à partir de photos de plats**  
+ - **Suggestions de recettes basées sur les ingrédients disponibles**  
+ - **Commande et paiement en ligne sécurisé**  
+ - **Notifications de commande par email**  
+ - **Gestion des commandes pour les administrateurs**  
 
 
 ---
