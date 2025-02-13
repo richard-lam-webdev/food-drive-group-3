@@ -1,7 +1,7 @@
+import { sendConfirmationEmail } from "@/lib/mailjet";
+import prisma from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import prisma from "@/lib/prisma";
-import { sendConfirmationEmail } from "@/lib/mailjet";
 
 // Déclaration des types
 interface CartItem {
@@ -97,7 +97,10 @@ export async function POST(request: Request) {
 
         return tx.commandes.update({
           where: { id: commande.id },
-          data: { total: cartItems.reduce((acc, item) => acc + item.prix * item.quantite, 0) },
+          data: { 
+            total: cartItems.reduce((acc, item) => acc + item.prix * item.quantite, 0),
+            statut: "payee"
+          },
           include: { LignesCommandes: true },
         });
       });

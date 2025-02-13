@@ -15,6 +15,7 @@ export default function DetectionPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   
+  // Redirection si l'utilisateur n'est pas authentifié en tant que client
   useEffect(() => {
     if (status === "loading") return; 
     if (!session || session.user.role !== "client") {
@@ -22,12 +23,14 @@ export default function DetectionPage() {
     }
   }, [session, status, router]);
 
+  // États pour les ingrédients détectés et manquants
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [missingIngredients, setMissingIngredients] = useState<string[]>([]);
   const { addIngredientsToCart } = useCart();
   const [message, setMessage] = useState<string | null>(null);
   const [reported, setReported] = useState(false);
 
+  // Charger les ingrédients depuis localStorage lors du montage
   useEffect(() => {
     const savedIngredients = localStorage.getItem("ingredients");
     if (savedIngredients) {
@@ -35,44 +38,63 @@ export default function DetectionPage() {
     }
   }, []);
 
+  // Mettre à jour localStorage chaque fois que le state 'ingredients' change
   useEffect(() => {
     localStorage.setItem("ingredients", JSON.stringify(ingredients));
   }, [ingredients]);
 
+  // Fonction d'upload et de traitement de l'image
   const handleUpload = async (file: File) => {
-    const formData = new FormData();
-    formData.append("image", file);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
 
-    const res = await fetch("/api/detect-ingredients", {
-      method: "POST",
-      body: formData,
-    });
+      const res = await fetch("/api/detect-ingredients", {
+        method: "POST",
+        body: formData,
+      });
+      
+      if (!res.ok) {
+        setMessage("❌ Erreur lors de la détection des ingrédients.");
+        return;
+      }
 
-    const data = (await res.json()) as DetectResponse;
-
-    setIngredients([...new Set(data.foundIngredients)]);
-    setMissingIngredients([...new Set(data.missingIngredients)]);
+      // Traitement de la réponse JSON
+      const data = (await res.json()) as DetectResponse;
+      setIngredients([...new Set(data.foundIngredients)]);
+      setMissingIngredients([...new Set(data.missingIngredients)]);
+    } catch (error) {
+      console.error("Erreur lors de l'upload :", error);
+      setMessage("❌ Erreur lors de l'upload de l'image.");
+    }
   };
 
+  // Ajouter les ingrédients détectés au panier
   const handleAddToCart = () => {
     addIngredientsToCart(ingredients);
     setMessage("✅ Ingrédients ajoutés à votre liste de courses !");
     setTimeout(() => setMessage(null), 3000);
   };
 
+  // Signaler les ingrédients manquants
   const handleReportMissingIngredients = async () => {
     if (reported || missingIngredients.length === 0) return;
 
-    const res = await fetch("/api/report-missing-ingredients", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ missingIngredients }),
-    });
+    try {
+      const res = await fetch("/api/report-missing-ingredients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ missingIngredients }),
+      });
 
-    if (res.ok) {
-      setReported(true);
-      setMessage("📩 Ingrédients signalés à l'administration.");
-    } else {
+      if (res.ok) {
+        setReported(true);
+        setMessage("📩 Ingrédients signalés à l'administration.");
+      } else {
+        setMessage("❌ Erreur lors du signalement.");
+      }
+    } catch (error) {
+      console.error("Erreur lors du signalement :", error);
       setMessage("❌ Erreur lors du signalement.");
     }
   };
@@ -87,33 +109,34 @@ export default function DetectionPage() {
 
       {ingredients.length > 0 && (
         <div className="mt-6 p-4 border rounded-md shadow-md bg-white max-w-md">
-          <h2 className="text-xl font-semibold">🍽️ Ingrédients détectés :</h2>
+          <h2 className="text-xl font-semibold mb-2">🍽️ Ingrédients détectés :</h2>
           <ul className="list-disc pl-5 text-gray-700">
             {ingredients.map((ingredient, index) => (
               <li key={index}>{ingredient}</li>
             ))}
           </ul>
-
           <button
             onClick={handleAddToCart}
             className="mt-4 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition"
           >
             ➕ Ajouter à ma liste de courses
           </button>
-
           {message && <p className="mt-2 text-green-600">{message}</p>}
         </div>
       )}
 
       {missingIngredients.length > 0 && (
         <div className="mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
-          ⚠️ Certains ingrédients ne sont pas en base :
-          <ul>
+          <p className="mb-2 font-semibold">⚠️ Certains ingrédients ne sont pas en base :</p>
+          <ul className="list-disc pl-5">
             {missingIngredients.map((ing, index) => (
-              <li key={index}>- {ing}</li>
+              <li key={index}>{ing}</li>
             ))}
           </ul>
-          <button onClick={handleReportMissingIngredients} className="mt-2 bg-red-500 text-white px-4 py-2 rounded">
+          <button
+            onClick={handleReportMissingIngredients}
+            className="mt-2 bg-red-500 text-white px-4 py-2 rounded transition hover:bg-red-600"
+          >
             🚨 Signaler
           </button>
         </div>
