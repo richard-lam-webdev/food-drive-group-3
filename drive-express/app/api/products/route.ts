@@ -4,22 +4,20 @@ import { NextResponse } from "next/server";
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const category = searchParams.get("category"); // Récupérer la catégorie depuis l'URL
+    const category = searchParams.get("category"); 
 
     let products;
 
     if (category) {
-      // Récupérer les produits d'une catégorie spécifique
       products = await prisma.produits.findMany({
         where: {
           Categories: {
-            nom: category, // Filtre par nom de catégorie
+            nom: category, 
           },
         },
-        include: { Categories: true }, // Inclure les détails de la catégorie
+        include: { Categories: true }, 
       });
     } else {
-      // Récupérer tous les produits
       products = await prisma.produits.findMany({
         include: { Categories: true },
       });

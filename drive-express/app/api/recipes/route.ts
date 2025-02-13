@@ -2,12 +2,12 @@ import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 
 const prisma = new PrismaClient();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-export async function POST(request: Request) {
+export async function POST() {
   const session = await getServerSession(authOptions);
   if (!session || !session.user?.email) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
       temperature: 0.7,
     });
 
-    const recipeText = completion.choices[0].message.content.trim();
+    const recipeText = completion.choices[0]?.message?.content?.trim() ?? "";
 
     // Extraction des ingrédients manquants depuis le texte généré
     let extractedMissingIngredients: string[] = [];

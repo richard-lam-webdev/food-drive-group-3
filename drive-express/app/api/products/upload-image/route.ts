@@ -10,7 +10,6 @@ export const config = {
 
 export async function POST(request: Request) {
   try {
-    // Utilisation de request.formData() pour récupérer le formulaire
     const formData = await request.formData();
     const productId = formData.get("productId");
     const file = formData.get("image") as File;
@@ -19,17 +18,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Données manquantes' }, { status: 400 });
     }
 
-    // Créer le répertoire de destination (public/produits) s'il n'existe pas déjà
     const destDir = path.join(process.cwd(), 'public', 'produits');
     await fs.mkdir(destDir, { recursive: true });
 
-    // Définir le chemin de destination public/produits/{productId}.png
     const destPath = path.join(destDir, `${productId}.png`);
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Écrire le fichier sur le disque
     await fs.writeFile(destPath, buffer);
 
     return NextResponse.json({ message: 'Image téléchargée avec succès' });

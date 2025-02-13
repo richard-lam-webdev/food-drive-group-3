@@ -1,16 +1,13 @@
-import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 import { PrismaClient } from "@prisma/client";
+import { getServerSession } from "next-auth/next";
+import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
-  // Vérifier que les cookies sont reçus
-  console.log("Cookies reçus :", request.headers.get("cookie"));
 
   const session = await getServerSession(authOptions);
-  console.log("Session récupérée :", session);
 
   if (!session || !session.user?.email) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });

@@ -48,6 +48,7 @@ export async function PUT(req: Request) {
     });
     return NextResponse.json(user);
   } catch (error) {
+    console.error('Erreur API PUT users:', error);
     return NextResponse.json({ error: 'Erreur lors de la mise à jour de l’utilisateur' }, { status: 500 });
   }
 }
@@ -60,6 +61,7 @@ export async function DELETE(req: Request) {
     });
     return NextResponse.json({ message: 'Utilisateur supprimé avec succès' });
   } catch (error) {
+    console.error('Erreur API DELETE users:', error);
     return NextResponse.json({ error: 'Erreur lors de la suppression de l’utilisateur' }, { status: 500 });
   }
 }

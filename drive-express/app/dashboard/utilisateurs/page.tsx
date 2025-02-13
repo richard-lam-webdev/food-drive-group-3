@@ -3,18 +3,29 @@
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
 
+interface User {
+  id: number;
+  nom: string;
+  email: string;
+  role: string;
+}
+
 export default function Utilisateurs() {
   const { data: session, status } = useSession();
 
-  const [users, setUsers] = useState([]);
-  const [userForm, setUserForm] = useState({
+  const [users, setUsers] = useState<User[]>([]);
+  const [userForm, setUserForm] = useState<{
+    id: number | null;
+    nom: string;
+    email: string;
+    role: string;
+  }>({
     id: null,
     nom: '',
     email: '',
     role: '',
   });
 
-   // Fetch utilisateurs
    const fetchUsers = async () => {
     const res = await fetch('/api/users');
     const data = await res.json();
@@ -25,7 +36,6 @@ export default function Utilisateurs() {
     fetchUsers();
   }, []);
 
-  // Soumission du formulaire utilisateur
   const handleUserSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const method = userForm.id ? 'PUT' : 'POST';
@@ -41,7 +51,6 @@ export default function Utilisateurs() {
     setUserForm({ id: null, nom: '', email: '', role: '' });
   };
 
-  // Supprimer utilisateur
   const handleUserDelete = async (id: number) => {
     await fetch('/api/users', {
       method: 'DELETE',
@@ -51,8 +60,7 @@ export default function Utilisateurs() {
     fetchUsers();
   };
 
-  // Modifier utilisateur
-  const handleUserEdit = (user: any) => {
+  const handleUserEdit = (user: User) => {
     setUserForm({
       id: user.id,
       nom: user.nom,
@@ -73,7 +81,6 @@ export default function Utilisateurs() {
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-4">Gestion des Utilisateurs</h1>
 
-      {/* Formulaire d'utilisateur */}
       <form onSubmit={handleUserSubmit} className="space-y-4">
         <input
           type="text"
@@ -99,6 +106,7 @@ export default function Utilisateurs() {
         >
           <option value="">Sélectionnez un rôle</option>
           <option value="admin">Admin</option>
+          <option value="magasinier">Magasinier</option>
           <option value="client">Utilisateur</option>
         </select>
         <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">
@@ -106,7 +114,6 @@ export default function Utilisateurs() {
         </button>
       </form>
 
-      {/* Liste des utilisateurs */}
       <table className="w-full mt-8 border-collapse border border-gray-300">
         <thead>
           <tr>
@@ -117,7 +124,7 @@ export default function Utilisateurs() {
           </tr>
         </thead>
         <tbody>
-          {users.map((user: any) => (
+          {users.map((user: User) => (
             <tr key={user.id}>
               <td className="border px-4 py-2">{user.nom}</td>
               <td className="border px-4 py-2">{user.email}</td>

@@ -9,12 +9,26 @@ import { useCallback, useState } from "react";
 import CartModal from "./CartModal";
 import SearchBar from "./SearchBar";
 
+interface Category {
+  id: number;
+  nom: string;
+}
+
+interface Product {
+  id: number;
+  nom: string;
+  prix: number;
+  description: string;
+  quantite_stock: number;
+  Categories?: Category;
+}
+
 export default function Header() {
   const { data: session } = useSession();
   const { cartItems } = useCart();
   const { products } = useProducts();
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [showResults, setShowResults] = useState(false);
 
   const handleSearch = useCallback(
@@ -37,12 +51,10 @@ export default function Header() {
 
   return (
     <header className="bg-white shadow-md py-4 px-6 flex flex-col md:flex-row md:justify-between items-center gap-4 relative">
-      {/* Logo / Titre */}
       <Link href="/" className="text-2xl font-bold text-blue-600">
         Drive Express
       </Link>
 
-      {/* Barre de recherche */}
       <div className="w-full md:w-1/3 relative">
         <SearchBar onSearch={handleSearch} />
         {showResults && filteredProducts.length > 0 && (
@@ -56,7 +68,7 @@ export default function Header() {
             {filteredProducts.map((product) => (
               <Link
                 key={product.id}
-                href={`/produit/${product.id}`}
+                href={`/product/${product.id}`}
                 className="block p-2 hover:bg-gray-100"
               >
                 {product.nom}
@@ -66,7 +78,6 @@ export default function Header() {
         )}
       </div>
 
-      {/* Menu utilisateur */}
       <div className="flex space-x-4 items-center">
         {!session ? (
           <>
@@ -74,7 +85,7 @@ export default function Header() {
               href="/register"
               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
             >
-              M'inscrire
+              M&apos;inscrire
             </Link>
             <Link
               href="/login"
@@ -88,6 +99,14 @@ export default function Header() {
             {session.user.role === "admin" && (
               <Link
                 href="/dashboard"
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+              >
+                Dashboard
+              </Link>
+            )}
+            {session.user.role === "magasinier" && (
+              <Link
+                href="/magasinier/dashboard"
                 className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
               >
                 Dashboard
@@ -109,7 +128,6 @@ export default function Header() {
         )}
       </div>
 
-      {/* Boutons d'icône pour "Mes Commandes" et "Panier" */}
       <div className="flex space-x-4 items-center">
         {session && (
           <Link href="/mes-commandes" className="relative">
@@ -138,13 +156,7 @@ export default function Header() {
         </button>
       </div>
 
-      {/* Modale du panier */}
-      {isCartOpen && (
-        <CartModal
-          cartItems={cartItems}
-          onClose={() => setIsCartOpen(false)}
-        />
-      )}
+      {isCartOpen && <CartModal onClose={() => setIsCartOpen(false)} />}     
     </header>
   );
 }

@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { useCart } from "@/context/CartContext";
 import { loadStripe } from "@stripe/stripe-js";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-// Chargez votre clé publique Stripe depuis l'environnement
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 export default function PaiementPage() {
@@ -14,15 +13,9 @@ export default function PaiementPage() {
   const router = useRouter();
   const { cartItems} = useCart(); 
   const [subTotal, setSubTotal] = useState(0);
-  const fraisLivraison = 5; // à ajuster selon vos besoins
-
+  const fraisLivraison = 5;
   useEffect(() => {
     if (status === "loading") return;
-    if (!session || cartItems.length === 0) {
-      // Vous pouvez rediriger ou afficher un message
-      console.log(session, cartItems);
-      // router.push("/panier");
-    }
     const total = cartItems.reduce(
       (acc, item) => acc + item.prix * item.quantite,
       0
@@ -32,7 +25,6 @@ export default function PaiementPage() {
 
   const handlePayment = async () => {
     try {
-      // Appeler l'API pour créer une session Stripe
       const res = await fetch("/api/stripe/create-checkout-session", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -44,7 +36,6 @@ export default function PaiementPage() {
         console.error(data.error);
         return;
       }
-      // Rediriger vers la session de paiement Stripe
       const stripe = await stripePromise;
       if (stripe) {
         const { error } = await stripe.redirectToCheckout({ sessionId: data.sessionId });

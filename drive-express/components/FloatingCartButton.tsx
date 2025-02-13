@@ -1,12 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import CartModal from "@/components/CartModal";
 import { useCart } from "@/context/CartContext";
-export default function FloatingCartButton() {
-  const { cartItems } = useCart();
-  const [isCartOpen, setIsCartOpen] = useState(false);
+import Image from "next/image";
+import { useEffect, useState } from "react";
+
+interface FloatingCartButtonProps {
+  onOpen: () => void;
+}
+
+export default function FloatingCartButton({ onOpen }: FloatingCartButtonProps) {
+  const { cartItems } = useCart(); 
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -19,10 +22,16 @@ export default function FloatingCartButton() {
     <>
       {isVisible && (
         <button
-          onClick={() => setIsCartOpen(true)}
+          onClick={onOpen}
           className="fixed bottom-8 right-8 bg-green-500 text-white p-4 rounded-full shadow-lg hover:bg-green-600"
         >
-          <Image src="/icon/Panier.png" alt="Panier" width={30} height={30} unoptimized />
+          <Image 
+            src="/icon/Panier.png" 
+            alt="Panier" 
+            width={30} 
+            height={30} 
+            unoptimized 
+          />
           {cartItems.length > 0 && (
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               {cartItems.reduce((total, item) => total + item.quantite, 0)}
@@ -30,7 +39,6 @@ export default function FloatingCartButton() {
           )}
         </button>
       )}
-      {isCartOpen && <CartModal onClose={() => setIsCartOpen(false)} />}
     </>
   );
 }

@@ -1,6 +1,6 @@
 services:
   nextjs:
-    image: node:18-alpine
+    image: node:18-bullseye
     working_dir: /app
     ports:
       - "5555:5555"

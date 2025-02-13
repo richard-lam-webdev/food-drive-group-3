@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FaSearch } from "react-icons/fa"; // ✅ Icône de recherche
+import { FaSearch } from "react-icons/fa";
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -13,11 +13,11 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setQuery(value);
-    onSearch(value); // ✅ Déclenche la recherche en temps réel
+    onSearch(value);
   };
 
   const handleSearch = () => {
-    onSearch(query); // ✅ Toujours utile pour la loupe ou Entrée
+    onSearch(query);
   };
 
   return (
@@ -26,7 +26,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         type="text"
         placeholder="Rechercher un produit..."
         value={query}
-        onChange={handleChange} // ✅ Recherche instantanée
+        onChange={handleChange}
         className="w-full p-2 border rounded-lg pl-10"
       />
       <button

@@ -5,7 +5,17 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-export default function ProductCard({ product }: { product: any }) {
+
+
+interface Product {
+  id: number;
+  nom: string;
+  prix: number;
+  description: string;
+  quantite_stock: number;
+}
+
+export default function ProductCard({ product }: { product: Product }) {
   const { cartItems, addToCart, updateCart } = useCart();
   const [quantity, setQuantity] = useState(0);
   const router = useRouter();
@@ -16,14 +26,11 @@ export default function ProductCard({ product }: { product: any }) {
   }, [cartItems, product.id]);
 
   const disablePlus = quantity >= product.quantite_stock;
-  console.log("Stock disponible pour", product.nom, ":", product.quantite_stock);
 
-  // Gère la navigation vers la page produit lors du clic sur la carte
   const handleCardClick = () => {
-    router.push(`/produit/${product.id}`);
+    router.push(`/product/${product.id}`);
   };
 
-  // Empêche la propagation de l'événement clic pour les boutons afin d'éviter la navigation
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
@@ -56,7 +63,7 @@ export default function ProductCard({ product }: { product: any }) {
         <button
           onClick={(e) => {
             stopPropagation(e);
-            addToCart(product);
+            addToCart({ ...product, quantite: 1 });
           }}
           className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition"
         >

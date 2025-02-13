@@ -1,4 +1,3 @@
-// lib/mailjet.ts
 import mailjet from 'node-mailjet';
 
 // Si le module a une propriété default, on l'utilise, sinon on utilise directement mailjetModule.
@@ -11,22 +10,20 @@ const mailjetClient = new mailjet({
 
 export async function sendConfirmationEmail(to: string, commandeId: number) {
   try {
-    console.log("Envoi de l'email de confirmation à", to);
-    console.log("commandeId", commandeId);
-    console.log("mailjetClient", mailjetClient);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const request = mailjetClient
       .post("send", { version: "v3.1" })
       .request({
         Messages: [
           {
             From: {
-              Email: "driveexpresseemi@gmail.com", // L'adresse e-mail de l'expéditeur
+              Email: "driveexpresseemi@gmail.com",
               Name: "Drive Express",
             },
             To: [
               {
-                Email: to, // L'adresse e-mail du client
-                Name: "",   // Vous pouvez renseigner le nom du client si disponible
+                Email: to,
+                Name: "",
               },
             ],
             Subject: "Confirmation de commande",
@@ -35,9 +32,6 @@ export async function sendConfirmationEmail(to: string, commandeId: number) {
           },
         ],
       });
-    const result = await request;
-    console.log("request", request);
-    console.log("Email envoyé:", result.body);
   } catch (error) {
     console.error("Erreur lors de l'envoi de l'email:", error);
   }
@@ -45,6 +39,7 @@ export async function sendConfirmationEmail(to: string, commandeId: number) {
 
 export async function sendMissingIngredientsEmail(to: string, ingredients: string[]) {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const request = await mailjetClient.post("send", { version: "v3.1" }).request({
       Messages: [
         {
@@ -71,7 +66,6 @@ export async function sendMissingIngredientsEmail(to: string, ingredients: strin
         },
       ],
     });
-    console.log("📧 Email d'alerte envoyé aux admins :", request.body);
   } catch (error) {
     console.error("❌ Erreur lors de l'envoi de l'email d'ingrédients manquants :", error);
   }

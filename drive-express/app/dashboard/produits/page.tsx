@@ -1,16 +1,29 @@
-// app/dashboard/products/page.tsx
 "use client";
-
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
+
+interface Product {
+  id: number;
+  nom: string;
+  description: string;
+  prix: number;
+  quantite_stock: number;
+  Categories?: {
+    nom: string;
+  };
+}
+
+interface Category {
+  id: number;
+  nom: string;
+}
 
 export default function Produits() {
   const { data: session, status } = useSession();
 
-  // États pour les produits
   const [products, setProducts] = useState([]);
   const [productForm, setProductForm] = useState({
-    id: null,
+    id: null as number | null,
     nom: '',
     description: '',
     prix: '',
@@ -18,20 +31,16 @@ export default function Produits() {
     categorie_nom: '',
   });
 
-  // Nouvel état pour le fichier image
   const [imageFile, setImageFile] = useState<File | null>(null);
 
-  // États pour les catégories
   const [categories, setCategories] = useState([]);
 
-  // Fetch produits
   const fetchProducts = async () => {
     const res = await fetch('/api/products');
     const data = await res.json();
     setProducts(data);
   };
 
-  // Fetch catégories
   const fetchCategories = async () => {
     const res = await fetch('/api/categories');
     const data = await res.json();
@@ -49,7 +58,6 @@ export default function Produits() {
     const method = productForm.id ? 'PUT' : 'POST';
     const url = productForm.id ? `/api/products/${productForm.id}` : '/api/products';
 
-    // Créer ou modifier le produit
     const res = await fetch(url, {
       method,
       body: JSON.stringify(productForm),
@@ -57,7 +65,6 @@ export default function Produits() {
     });
     const data = await res.json();
 
-    // Si un fichier image est sélectionné et que le produit a été créé/mis à jour, on lance l'upload
     if (imageFile && data.id) {
       const formData = new FormData();
       formData.append("productId", data.id);
@@ -81,16 +88,16 @@ export default function Produits() {
     });
   };
 
-  // Supprimer produit
   const handleProductDelete = async (id: number) => {
     await fetch(`/api/products/${id}`, { method: 'DELETE' });
     fetchProducts();
   };
 
-  // Modifier produit
-  const handleProductEdit = (product: any) => {
+  const handleProductEdit = (product: Product) => {
     setProductForm({
       ...product,
+      prix: product.prix.toString(),
+      quantite_stock: product.quantite_stock.toString(),
       categorie_nom: product.Categories?.nom || '',
     });
   };
@@ -107,7 +114,7 @@ export default function Produits() {
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-4">Gestion des Produits</h1>
 
-      {/* Formulaire pour gérer les produits */}
+      {/* Formulaire d'ajout de produit */}
       <form onSubmit={handleProductSubmit} className="space-y-4">
         <input
           type="text"
@@ -146,7 +153,7 @@ export default function Produits() {
           required
         >
           <option value="">Sélectionnez une catégorie</option>
-          {categories.map((category: any) => (
+          {categories.map((category: Category) => (
             <option key={category.id} value={category.nom}>
               {category.nom}
             </option>
@@ -183,7 +190,7 @@ export default function Produits() {
           </tr>
         </thead>
         <tbody>
-          {products.map((product: any) => (
+          {products.map((product: Product) => (
             <tr key={product.id}>
               <td className="border px-4 py-2">{product.nom}</td>
               <td className="border px-4 py-2">{product.description}</td>

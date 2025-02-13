@@ -5,7 +5,9 @@ CREATE TABLE `Utilisateurs` (
     `password` VARCHAR(191) NOT NULL,
     `nom` VARCHAR(191) NULL,
     `prenom` VARCHAR(191) NULL,
-    `adresse` VARCHAR(191) NULL,
+    `numeroRue` VARCHAR(191) NULL,
+    `codePostal` VARCHAR(191) NULL,
+    `ville` VARCHAR(191) NULL,
     `role` ENUM('client', 'admin', 'magasinier') NOT NULL DEFAULT 'client',
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
@@ -41,9 +43,9 @@ CREATE TABLE `RecettesTemp` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `user_id` INTEGER NOT NULL,
     `nom` VARCHAR(191) NOT NULL,
-    `description` VARCHAR(191) NULL,
+    `description` TEXT NULL,
     `ingredients` VARCHAR(191) NULL,
-    `instructions` VARCHAR(191) NULL,
+    `instructions` TEXT NULL,
     `generated_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
@@ -79,7 +81,7 @@ CREATE TABLE `Commandes` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `user_id` INTEGER NOT NULL,
     `total` DOUBLE NOT NULL,
-    `statut` ENUM('en_cours_de_paiement', 'payee', 'en_preparation', 'expediee', 'livree') NOT NULL DEFAULT 'en_cours_de_paiement',
+    `statut` ENUM('panier', 'en_cours_de_paiement', 'payee', 'en_preparation', 'expediee', 'livree') NOT NULL DEFAULT 'en_cours_de_paiement',
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 
@@ -103,7 +105,7 @@ CREATE TABLE `LignesCommandes` (
 CREATE TABLE `HistoriqueCommandes` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `order_id` INTEGER NOT NULL,
-    `statut` ENUM('en_cours_de_paiement', 'payee', 'en_preparation', 'expediee', 'livree') NOT NULL,
+    `statut` ENUM('panier', 'en_cours_de_paiement', 'payee', 'en_preparation', 'expediee', 'livree') NOT NULL,
     `changed_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
 
     PRIMARY KEY (`id`)
