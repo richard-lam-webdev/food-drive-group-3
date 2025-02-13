@@ -16,30 +16,25 @@ export default function LivraisonPage() {
   const [saveAddress, setSaveAddress] = useState(false);
 
   useEffect(() => {
-    // Attendre que la session soit chargée
     if (status === "loading") return;
 
-    // Rediriger si l'utilisateur n'est pas connecté ou si le panier est vide
     if (!session || cartItems.length === 0) {
       router.push("/panier");
       return;
     }
 
-    // Récupérer l'adresse enregistrée
     const fetchAdresse = async () => {
       try {
         const res = await fetch("/api/users/getAdresse", {
           method: "GET",
           headers: { "Content-Type": "application/json" },
-          credentials: "include", // Assure l'envoi des cookies
+          credentials: "include", 
         });
         if (res.ok) {
           const data = await res.json();
-          // Si une adresse est présente, on met à jour les états correspondants
           if (data.numeroRue) setNumeroRue(data.numeroRue);
           if (data.codePostal) setCodePostal(data.codePostal);
           if (data.ville) setVille(data.ville);
-          // Vous pouvez aussi décider de cocher par défaut la case si une adresse existe
           setSaveAddress(true);
         } else {
           console.error("Erreur lors de la récupération de l'adresse:", await res.text());
@@ -55,13 +50,12 @@ export default function LivraisonPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Si on souhaite sauvegarder l'adresse, on l'envoie à l'API updateAdresse
     if (saveAddress) {
       try {
         const res = await fetch("/api/users/updateAdresse", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          credentials: "include", // Envoi des cookies
+          credentials: "include", 
           body: JSON.stringify({ numeroRue, codePostal, ville, saveAddress }),
         });
         if (!res.ok) {
@@ -72,7 +66,6 @@ export default function LivraisonPage() {
       }
     }
 
-    // Rediriger vers la page de paiement
     router.push("/panier/paiement");
   };
 

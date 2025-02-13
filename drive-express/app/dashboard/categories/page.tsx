@@ -7,7 +7,6 @@ import Image from "next/image";
 interface Category {
   id: number;
   nom: string;
-  // Vous pouvez ajouter d'autres champs si nécessaire
 }
 
 export default function Categories() {

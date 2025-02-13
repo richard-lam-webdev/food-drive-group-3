@@ -32,7 +32,6 @@ export default function ProductCard({ product }: { product: Product }) {
     router.push(`/product/${product.id}`);
   };
 
-  // Empêche la propagation de l'événement clic pour les boutons afin d'éviter la navigation
   const stopPropagation = (e: React.MouseEvent) => {
     e.stopPropagation();
   };

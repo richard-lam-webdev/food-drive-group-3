@@ -7,7 +7,6 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 export async function GET() {
-  // Récupérer la session de l'utilisateur
   const session = await getServerSession(authOptions);
 
   if (!session || !session.user?.email) {

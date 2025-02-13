@@ -13,7 +13,6 @@ export default function PanierPage() {
   const [subTotal, setSubTotal] = useState(0);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
-  // Calcul du sous-total
   useEffect(() => {
     const total = cartItems.reduce(
       (acc, item) => acc + item.prix * item.quantite,
@@ -22,7 +21,6 @@ export default function PanierPage() {
     setSubTotal(total);
   }, [cartItems]);
 
-  // Afficher le popup de connexion si l'utilisateur n'est pas connecté
   useEffect(() => {
     if (!session) {
       setIsPopupOpen(true);
@@ -47,12 +45,10 @@ export default function PanierPage() {
       <div className="bg-white shadow rounded-lg p-4 mb-6">
         {cartItems.length > 0 ? (
           cartItems.map((item) => {
-            // Vérifier si on peut augmenter la quantité (en fonction du stock)
             const disablePlus = item.quantite >= (item.quantite_stock ?? 0);
             return (
               <div key={item.id} className="border-b py-4">
                 <div className="flex justify-between items-center">
-                  {/* Utilisation de l'ID du produit pour générer le chemin de l'image */}
                   <Image
                     src={`/produits/${item.id}.png`}
                     alt={item.nom}
@@ -105,7 +101,6 @@ export default function PanierPage() {
         )}
       </div>
 
-      {/* Récapitulatif et bouton de suite */}
       {cartItems.length > 0 && (
         <div className="bg-gray-100 p-4 rounded-lg mb-6">
           <h2 className="font-bold text-lg mb-4">Sous-total</h2>
@@ -119,7 +114,6 @@ export default function PanierPage() {
         </div>
       )}
 
-      {/* Pop-up de Connexion (si pas de session) */}
       {isPopupOpen && !session && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg text-center relative">

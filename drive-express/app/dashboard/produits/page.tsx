@@ -21,7 +21,6 @@ interface Category {
 export default function Produits() {
   const { data: session, status } = useSession();
 
-  // États pour les produits
   const [products, setProducts] = useState([]);
   const [productForm, setProductForm] = useState({
     id: null as number | null,
@@ -32,13 +31,10 @@ export default function Produits() {
     categorie_nom: '',
   });
 
-  // Nouvel état pour le fichier image
   const [imageFile, setImageFile] = useState<File | null>(null);
 
-  // États pour les catégories
   const [categories, setCategories] = useState([]);
 
-  // Fetch produits
   const fetchProducts = async () => {
     const res = await fetch('/api/products');
     const data = await res.json();
@@ -119,7 +115,7 @@ export default function Produits() {
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-4">Gestion des Produits</h1>
 
-      {/* Formulaire pour gérer les produits */}
+      {/* Formulaire d'ajout de produit */}
       <form onSubmit={handleProductSubmit} className="space-y-4">
         <input
           type="text"

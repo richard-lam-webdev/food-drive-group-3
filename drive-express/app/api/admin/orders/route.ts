@@ -1,17 +1,13 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma"; // Assurez-vous d'avoir une instance Prisma dans ce fichier
+import prisma from "@/lib/prisma"; 
 
 export async function GET() {
   try {
-    // Récupérer toutes les commandes (toutes, ou vous pouvez exclure celles en "panier")
     const orders = await prisma.commandes.findMany({
-      // Pour l'admin, vous pouvez afficher toutes les commandes
       where: {
-        // Par exemple, pour exclure uniquement le panier :
         NOT: { statut: "panier" },
       },
       include: {
-        // Inclure les lignes de commande avec les informations des produits
         LignesCommandes: {
           include: {
             Produits: {
@@ -21,7 +17,6 @@ export async function GET() {
             },
           },
         },
-        // Inclure quelques informations sur l'utilisateur
         Utilisateurs: {
           select: {
             email: true,
