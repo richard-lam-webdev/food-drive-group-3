@@ -39,6 +39,7 @@ export async function sendConfirmationEmail(to: string, commandeId: number) {
 
 export async function sendMissingIngredientsEmail(to: string, ingredients: string[]) {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const request = await mailjetClient.post("send", { version: "v3.1" }).request({
       Messages: [
         {
