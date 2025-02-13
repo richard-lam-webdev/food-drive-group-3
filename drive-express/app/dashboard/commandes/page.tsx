@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from 'next-auth/react';
+
 
 interface Order {
   id: number;
@@ -13,6 +15,8 @@ interface Order {
 export default function ValidateOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const { data: session, status } = useSession();
+
 
   const fetchOrders = async () => {
     try {
@@ -36,6 +40,14 @@ export default function ValidateOrdersPage() {
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  if (status === 'loading') {
+    return <p>Chargement...</p>;
+  }
+
+  if (!session || session.user.role !== 'admin') {
+    return <p>Accès refusé. Veuillez vous connecter en tant qu’administrateur.</p>;
+  }
 
   const handleValidate = async (orderId: number) => {
     try {

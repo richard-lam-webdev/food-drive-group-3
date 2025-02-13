@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from 'next-auth/react';
 import Image from "next/image";
 
 
@@ -14,6 +15,8 @@ export default function Categories() {
   const [categoryName, setCategoryName] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [editingCategoryId, setEditingCategoryId] = useState<number | null>(null);
+  const { data: session, status } = useSession();
+  
 
   const fetchCategories = async () => {
     const res = await fetch('/api/categories', {
@@ -70,6 +73,15 @@ export default function Categories() {
       alert("Erreur lors de la mise à jour de l'image");
     }
   };
+
+  if (status === 'loading') {
+    return <p>Chargement...</p>;
+  }
+
+
+  if (!session || session.user.role !== 'admin') {
+    return <p>Accès refusé. Veuillez vous connecter en tant qu’administrateur.</p>;
+  }
 
   return (
     <div className="p-8">
