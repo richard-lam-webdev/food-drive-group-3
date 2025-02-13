@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Image from "next/image";
 import { useCart } from "@/context/CartContext";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
 interface FloatingCartButtonProps {
   onOpen: () => void;
@@ -22,7 +22,7 @@ export default function FloatingCartButton({ onOpen }: FloatingCartButtonProps) 
     <>
       {isVisible && (
         <button
-          onClick={onOpen} 
+          onClick={onOpen}
           className="fixed bottom-8 right-8 bg-green-500 text-white p-4 rounded-full shadow-lg hover:bg-green-600"
         >
           <Image 
