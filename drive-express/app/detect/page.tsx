@@ -2,6 +2,8 @@
 
 import ImageUploader from "@/components/ImageUploader";
 import { useCart } from "@/context/CartContext";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface DetectResponse {
@@ -9,8 +11,17 @@ interface DetectResponse {
   missingIngredients: string[];
 }
 
-
 export default function DetectionPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  
+  useEffect(() => {
+    if (status === "loading") return; 
+    if (!session || session.user.role !== "client") {
+      router.push("/login");
+    }
+  }, [session, status, router]);
+
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [missingIngredients, setMissingIngredients] = useState<string[]>([]);
   const { addIngredientsToCart } = useCart();
@@ -31,18 +42,17 @@ export default function DetectionPage() {
   const handleUpload = async (file: File) => {
     const formData = new FormData();
     formData.append("image", file);
-  
+
     const res = await fetch("/api/detect-ingredients", {
       method: "POST",
       body: formData,
     });
-  
+
     const data = (await res.json()) as DetectResponse;
-  
+
     setIngredients([...new Set(data.foundIngredients)]);
     setMissingIngredients([...new Set(data.missingIngredients)]);
   };
-  
 
   const handleAddToCart = () => {
     addIngredientsToCart(ingredients);
@@ -52,7 +62,7 @@ export default function DetectionPage() {
 
   const handleReportMissingIngredients = async () => {
     if (reported || missingIngredients.length === 0) return;
-    
+
     const res = await fetch("/api/report-missing-ingredients", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -67,9 +77,12 @@ export default function DetectionPage() {
     }
   };
 
+  if (status === "loading") {
+    return <div className="flex items-center justify-center h-screen">🔄 Chargement...</div>;
+  }
+
   return (
     <div className="flex flex-col items-center p-8">
-      <h1 className="text-2xl font-bold mb-4">📷 Détection d’Ingrédients</h1>
       <ImageUploader onImageUpload={handleUpload} />
 
       {ingredients.length > 0 && (
