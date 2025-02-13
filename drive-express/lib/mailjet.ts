@@ -1,4 +1,3 @@
-// lib/mailjet.ts
 import mailjet from 'node-mailjet';
 
 // Si le module a une propriété default, on l'utilise, sinon on utilise directement mailjetModule.
@@ -17,13 +16,13 @@ export async function sendConfirmationEmail(to: string, commandeId: number) {
         Messages: [
           {
             From: {
-              Email: "driveexpresseemi@gmail.com", // L'adresse e-mail de l'expéditeur
+              Email: "driveexpresseemi@gmail.com",
               Name: "Drive Express",
             },
             To: [
               {
-                Email: to, // L'adresse e-mail du client
-                Name: "",   // Vous pouvez renseigner le nom du client si disponible
+                Email: to,
+                Name: "",
               },
             ],
             Subject: "Confirmation de commande",
