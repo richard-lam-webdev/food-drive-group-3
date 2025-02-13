@@ -3,6 +3,7 @@
 import { useCart } from "@/context/CartContext";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "react-toastify";
 import RecipeModal from "./RecipeModal";
 
 interface CartModalProps {
@@ -27,80 +28,80 @@ export default function CartModal({ onClose }: CartModalProps) {
     setRecipe(null);
     setMissingIngredients([]);
 
-    const res = await fetch("/api/recipes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
-    });
+    try {
+      const res = await fetch("/api/recipes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
 
-    const data = await res.json();
-    setLoadingRecipe(false);
+      const data = await res.json();
+      setLoadingRecipe(false);
 
-    if (data.error) {
-      alert("Erreur lors de la génération de la recette.");
-      return;
+      if (data.error) {
+        toast.error("Erreur lors de la génération de la recette.");
+        return;
+      }
+
+      setRecipe(data.recipe?.description || "Aucune recette trouvée.");
+      setMissingIngredients(data.recipe?.missingIngredients || []);
+      setShowRecipeModal(true);
+    } catch (error) {
+      setLoadingRecipe(false);
+      toast.error("Erreur réseau, impossible de récupérer une recette.");
     }
-
-    setRecipe(data.recipe?.description || "Aucune recette trouvée.");
-    setMissingIngredients(data.recipe?.missingIngredients || []);
-    setShowRecipeModal(true);
   };
 
   const handleAddMissingIngredients = async () => {
     if (missingIngredients.length === 0) return;
-  
-    const res = await fetch("/api/check-ingredients", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ingredients: missingIngredients }),
-    });
-  
-    const data = await res.json();
-    // data.availableIngredients est maintenant un tableau d'objets { id, nom, quantite_stock }
-    const availableFromAPI: { id: number; nom: string; quantite_stock: number }[] = data.availableIngredients || [];
-  
-    const ingredientsAjoutes: string[] = [];
-  
-    missingIngredients.forEach((ingredient) => {
-      const normalizedIngredient = ingredient.replace(/\s*\(.*?\)\s*/g, "").trim().toLowerCase();
-  
-      // Chercher le produit correspondant en se basant sur le nom normalisé
-      const produit = availableFromAPI.find(
-        (p) => p.nom.toLowerCase().trim() === normalizedIngredient ||
-               p.nom.toLowerCase().trim().includes(normalizedIngredient)
-      );
-  
-      if (produit) {
-        const cartItem = cartItems.find(
-          (item) => item.nom.toLowerCase().trim() === produit.nom.toLowerCase().trim()
+
+    try {
+      const res = await fetch("/api/check-ingredients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ingredients: missingIngredients }),
+      });
+
+      const data = await res.json();
+      const availableFromAPI: { id: number; nom: string; quantite_stock: number }[] =
+        data.availableIngredients || [];
+
+      const ingredientsAjoutes: string[] = [];
+
+      missingIngredients.forEach((ingredient) => {
+        const normalizedIngredient = ingredient.replace(/\s*\(.*?\)\s*/g, "").trim().toLowerCase();
+
+        const produit = availableFromAPI.find(
+          (p) =>
+            p.nom.toLowerCase().trim() === normalizedIngredient ||
+            p.nom.toLowerCase().trim().includes(normalizedIngredient)
         );
-        const currentQty = cartItem ? cartItem.quantite : 0;
-  
-        if (currentQty < produit.quantite_stock) {
-          // Utiliser l'ID réel du produit
-          addToCart({ id: produit.id, nom: produit.nom, quantite: 1, prix: 1 });
-          ingredientsAjoutes.push(produit.nom);
-        } else {
-          console.log(
-            `${ingredient} a déjà atteint la quantité maximale (stock: ${produit.quantite_stock}).`
+
+        if (produit) {
+          const cartItem = cartItems.find(
+            (item) => item.nom.toLowerCase().trim() === produit.nom.toLowerCase().trim()
           );
+          const currentQty = cartItem ? cartItem.quantite : 0;
+
+          if (currentQty < produit.quantite_stock) {
+            addToCart({ id: produit.id, nom: produit.nom, quantite: 1, prix: 1 });
+            ingredientsAjoutes.push(produit.nom);
+          } else {
+            toast.warn(`${produit.nom} atteint la quantité max disponible.`);
+          }
         }
+      });
+
+      if (ingredientsAjoutes.length === 0) {
+        toast.warn("Aucun ingrédient n'a été ajouté car soit ils ne sont pas disponibles en stock, soit la quantité maximale est déjà atteinte.");
       } else {
-        console.log(`${ingredient} n'est pas disponible en stock.`);
+        toast.success(`Ajouté au panier : ${ingredientsAjoutes.join(", ")}.`);
       }
-    });
-  
-    if (ingredientsAjoutes.length === 0) {
-      alert(
-        "Aucun ingrédient n'a été ajouté car soit ils ne sont pas disponibles en stock, soit la quantité maximale est déjà atteinte."
-      );
-    } else {
-      alert(
-        `Les ingrédients suivants ont été ajoutés : ${ingredientsAjoutes.join(", ")}.`
-      );
+      setShowRecipeModal(false);
+    } catch (error) {
+      toast.error("Erreur réseau, impossible d'ajouter les ingrédients.");
     }
-    setShowRecipeModal(false);
-  };  
+  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -144,10 +145,7 @@ export default function CartModal({ onClose }: CartModalProps) {
               <p className="text-right text-lg font-bold text-gray-800">
                 Sous-total :{" "}
                 <span className="text-green-600">
-                  {cartItems
-                    .reduce((acc, item) => acc + item.prix * item.quantite, 0)
-                    .toFixed(2)}{" "}
-                  €
+                  {cartItems.reduce((acc, item) => acc + item.prix * item.quantite, 0).toFixed(2)} €
                 </span>
               </p>
             </div>
@@ -171,15 +169,18 @@ export default function CartModal({ onClose }: CartModalProps) {
         )}
 
         {showRecipeModal && recipe && (
-          <RecipeModal 
-            recipe={recipe} 
-            missingIngredients={missingIngredients} 
+          <RecipeModal
+            recipe={recipe}
+            missingIngredients={missingIngredients}
             onClose={() => setShowRecipeModal(false)}
             onAddMissing={handleAddMissingIngredients}
           />
         )}
 
-        <button onClick={onClose} className="mt-4 bg-gray-300 p-2 rounded-lg hover:bg-gray-400 w-full">
+        <button
+          onClick={onClose}
+          className="mt-4 bg-gray-300 p-2 rounded-lg hover:bg-gray-400 w-full"
+        >
           Fermer
         </button>
       </div>

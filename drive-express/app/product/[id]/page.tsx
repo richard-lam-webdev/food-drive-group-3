@@ -1,9 +1,9 @@
 "use client";
 
+import { useCart } from "@/context/CartContext";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import Image from "next/image";
-import { useCart } from "@/context/CartContext";
 
 type Product = {
   id: number;
@@ -15,7 +15,6 @@ type Product = {
 
 export default function ProductPage() {
   const { id } = useParams(); 
-  console.log("ID récupéré:", id); 
   const router = useRouter();
   const { cartItems, addToCart, updateCart } = useCart();
 

@@ -26,7 +26,6 @@ export default function ProductCard({ product }: { product: Product }) {
   }, [cartItems, product.id]);
 
   const disablePlus = quantity >= product.quantite_stock;
-  console.log("Stock disponible pour", product.nom, ":", product.quantite_stock);
 
   // Gère la navigation vers la page produit lors du clic sur la carte
   const handleCardClick = () => {

@@ -38,7 +38,6 @@ export default function DetectionPage() {
     });
   
     const data = (await res.json()) as DetectResponse;
-    console.log("📥 Données reçues de l'API :", data);
   
     setIngredients([...new Set(data.foundIngredients)]);
     setMissingIngredients([...new Set(data.missingIngredients)]);

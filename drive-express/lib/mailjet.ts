@@ -11,9 +11,6 @@ const mailjetClient = new mailjet({
 
 export async function sendConfirmationEmail(to: string, commandeId: number) {
   try {
-    console.log("Envoi de l'email de confirmation à", to);
-    console.log("commandeId", commandeId);
-    console.log("mailjetClient", mailjetClient);
     const request = mailjetClient
       .post("send", { version: "v3.1" })
       .request({
@@ -35,9 +32,6 @@ export async function sendConfirmationEmail(to: string, commandeId: number) {
           },
         ],
       });
-    const result = await request;
-    console.log("request", request);
-    console.log("Email envoyé:", result.body);
   } catch (error) {
     console.error("Erreur lors de l'envoi de l'email:", error);
   }
@@ -71,7 +65,6 @@ export async function sendMissingIngredientsEmail(to: string, ingredients: strin
         },
       ],
     });
-    console.log("📧 Email d'alerte envoyé aux admins :", request.body);
   } catch (error) {
     console.error("❌ Erreur lors de l'envoi de l'email d'ingrédients manquants :", error);
   }

@@ -36,7 +36,6 @@ export default function ImageUploader({ onImageUpload }: { onImageUpload: (file:
       });
 
       const data = await response.json();
-      console.log("📥 Données reçues de l'API :", data);
 
       if (response.ok) {
         const cleanedIngredients = data.ingredients?.filter((ing: string) => /^\d+\./.test(ing)) || [];

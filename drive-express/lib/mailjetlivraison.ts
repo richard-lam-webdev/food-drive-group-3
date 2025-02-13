@@ -29,7 +29,6 @@ export async function sendDispatchEmail(to: string, orderId: number) {
           },
         ],
       });
-    console.log("Email de dispatch envoyé:", request.body);
   } catch (error) {
     console.error("Erreur lors de l'envoi de l'email de dispatch:", error);
   }
