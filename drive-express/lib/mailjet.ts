@@ -10,6 +10,7 @@ const mailjetClient = new mailjet({
 
 export async function sendConfirmationEmail(to: string, commandeId: number) {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const request = mailjetClient
       .post("send", { version: "v3.1" })
       .request({
