@@ -8,7 +8,6 @@ interface Order {
   statut: string;
   created_at: string;
   Utilisateurs: { email: string };
-  // Vous pouvez ajouter d'autres champs si nécessaire
 }
 
 export default function ValidateOrdersPage() {
@@ -23,7 +22,6 @@ export default function ValidateOrdersPage() {
       });
       if (res.ok) {
         const data = await res.json();
-        // On garde toutes les commandes, même celles déjà expédiées
         setOrders(data);
       } else {
         console.error("Erreur lors du chargement des commandes:", await res.text());

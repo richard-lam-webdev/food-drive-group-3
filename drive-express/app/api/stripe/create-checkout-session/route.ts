@@ -3,7 +3,6 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/authOptions";
 import Stripe from "stripe";
 
-// Définir les interfaces
 interface CartItem {
   id: string | number;
   quantite: number;
@@ -22,7 +21,6 @@ interface RequestBody {
   fraisLivraison: number;
 }
 
-// Initialisation de Stripe avec vérification de l'environnement
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 if (!stripeSecretKey) {
   throw new Error('STRIPE_SECRET_KEY is not defined');

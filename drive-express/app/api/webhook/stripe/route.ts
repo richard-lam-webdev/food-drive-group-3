@@ -50,21 +50,17 @@ export async function POST(request: Request) {
     const checkoutSession = event.data.object as Stripe.Checkout.Session;
     const metadata = checkoutSession.metadata as StripeMetadata;
 
-    // Validation des métadonnées
     if (!metadata?.userId || !metadata.cartItems) {
       console.error("Métadonnées incomplètes");
       return new NextResponse("Données de commande invalides", { status: 400 });
     }
 
     try {
-      // Conversion des données
       const userId = parseInt(metadata.userId, 10);
       const cartItems: CartItem[] = JSON.parse(metadata.cartItems);
       const totalAmount = checkoutSession.amount_total ? checkoutSession.amount_total / 100 : 0;
 
-      // Gestion de la commande
       const commande = await prisma.$transaction(async (tx) => {
-        // Recherche ou création de la commande
         let commande = await tx.commandes.findFirst({
           where: { user_id: userId, statut: "panier" },
         });
@@ -81,7 +77,6 @@ export async function POST(request: Request) {
           });
         }
 
-        // Création des lignes de commande
         await tx.lignesCommandes.createMany({
           data: cartItems.map(item => ({
             order_id: commande.id,
@@ -91,7 +86,6 @@ export async function POST(request: Request) {
           })),
         });
 
-        // Mise à jour du stock
         await Promise.all(
           cartItems.map(item =>
             tx.produits.update({
@@ -108,7 +102,6 @@ export async function POST(request: Request) {
         });
       });
 
-      // Envoi d'email
       if (checkoutSession.customer_email) {
         await sendConfirmationEmail(checkoutSession.customer_email, commande.id);
       }

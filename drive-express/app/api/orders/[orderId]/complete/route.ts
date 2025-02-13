@@ -8,7 +8,6 @@ export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ orderId: string }> }
 ) {
-  // Résolution de la Promise des paramètres
   const { orderId } = await params;
   const numericOrderId = parseInt(orderId);
   

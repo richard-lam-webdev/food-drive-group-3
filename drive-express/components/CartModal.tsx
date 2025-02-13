@@ -46,6 +46,7 @@ export default function CartModal({ onClose }: CartModalProps) {
       setRecipe(data.recipe?.description || "Aucune recette trouvée.");
       setMissingIngredients(data.recipe?.missingIngredients || []);
       setShowRecipeModal(true);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       setLoadingRecipe(false);
       toast.error("Erreur réseau, impossible de récupérer une recette.");
@@ -98,6 +99,7 @@ export default function CartModal({ onClose }: CartModalProps) {
         toast.success(`Ajouté au panier : ${ingredientsAjoutes.join(", ")}.`);
       }
       setShowRecipeModal(false);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error("Erreur réseau, impossible d'ajouter les ingrédients.");
     }

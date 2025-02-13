@@ -14,7 +14,6 @@ export default function CategoriesSection() {
   const [categories, setCategories] = useState<Category[]>([]);
   const carouselRef = useRef<HTMLDivElement>(null);
 
-  // Charger les catégories via l'API existante (/api/categories)
   useEffect(() => {
     async function fetchCategories() {
       try {

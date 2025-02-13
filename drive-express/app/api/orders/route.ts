@@ -31,12 +31,10 @@ export async function GET() {
   return NextResponse.json({ orders });
 }
 
-// PATCH : Marquer une commande comme complète
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ orderId: string }> } // Spécifiez que params est une Promise
+  { params }: { params: Promise<{ orderId: string }> } 
 ) {
-  // Attendre la résolution des paramètres avant de les utiliser
   const { orderId } = await params;
   
   const session = await getServerSession(authOptions);
