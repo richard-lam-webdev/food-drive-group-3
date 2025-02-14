@@ -97,7 +97,10 @@ export async function POST(request: Request) {
 
         return tx.commandes.update({
           where: { id: commande.id },
-          data: { total: cartItems.reduce((acc, item) => acc + item.prix * item.quantite, 0) },
+          data: { 
+            total: cartItems.reduce((acc, item) => acc + item.prix * item.quantite, 0),
+            statut: "payee"
+          },
           include: { LignesCommandes: true },
         });
       });
