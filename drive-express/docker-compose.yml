@@ -1,30 +1,18 @@
+version: '3.8'
 services:
   nextjs:
-    image: node:18-bullseye
-    working_dir: /app
-    ports:
-      - "5555:5555"
-      - "3000:3000"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - next-cache:/app/.next
-    env_file:
-      - .env
+    image: ghcr.io/richard-lam-webdev/food-drive-group-3/nextjs-app:latest
+    restart: always
     environment:
-      NODE_ENV: development
-    command: >
-      sh -c "
-        npm install &&
-        npm run dev
-      "
+      NODE_ENV: production
+    ports:
+      - "3000:3000"
     depends_on:
       - db
 
   db:
     image: mysql:8.0
-    ports:
-      - "3306:3306"
+    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_USER: myuser
@@ -35,14 +23,14 @@ services:
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    ports:
-      - "8080:80"
+    restart: always
     environment:
       PMA_HOST: db
       MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "8080:80"
     depends_on:
       - db
 
 volumes:
-  next-cache:
   mysql_data:
